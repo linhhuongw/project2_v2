@@ -1,0 +1,43 @@
+{
+  "name": "home_credit",
+  "overview": {
+    "rows": 307511.0,
+    "features": 121.0,
+    "numeric_features": 105.0,
+    "categorical_features": 16.0,
+    "duplicate_rows": 0.0,
+    "cells_missing_pct": 24.4,
+    "features_with_missing": 67.0
+  },
+  "target": {
+    "n": 307511,
+    "n_bad": 24825,
+    "n_good": 282686,
+    "bad_rate_pct": 8.07,
+    "imbalance_ratio": 11.39
+  },
+  "missing_top": {
+    "COMMONAREA_AVG": 69.87,
+    "COMMONAREA_MODE": 69.87,
+    "COMMONAREA_MEDI": 69.87,
+    "NONLIVINGAPARTMENTS_MODE": 69.43,
+    "NONLIVINGAPARTMENTS_AVG": 69.43,
+    "NONLIVINGAPARTMENTS_MEDI": 69.43,
+    "FONDKAPREMONT_MODE": 68.39,
+    "LIVINGAPARTMENTS_MODE": 68.35,
+    "LIVINGAPARTMENTS_MEDI": 68.35,
+    "LIVINGAPARTMENTS_AVG": 68.35
+  },
+  "n_numeric_abs_skew_gt2": 45,
+  "n_numeric": 73,
+  "max_abs_skew": 391.558,
+  "top_auc": {
+    "EXT_SOURCE_3": 0.679,
+    "EXT_SOURCE_1": 0.666,
+    "EXT_SOURCE_2": 0.656,
+    "DAYS_BIRTH": 0.583,
+    "OWN_CAR_AGE": 0.559
+  },
+  "days_employed_anomaly_pct": 18.01,
+  "cols_missing_gt50": 41
+}

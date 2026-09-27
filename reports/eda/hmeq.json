@@ -1,0 +1,64 @@
+{
+  "name": "hmeq",
+  "overview": {
+    "rows": 5960.0,
+    "features": 12.0,
+    "numeric_features": 10.0,
+    "categorical_features": 2.0,
+    "duplicate_rows": 0.0,
+    "cells_missing_pct": 6.8,
+    "features_with_missing": 11.0
+  },
+  "target": {
+    "n": 5960,
+    "n_bad": 1189,
+    "n_good": 4771,
+    "bad_rate_pct": 19.95,
+    "imbalance_ratio": 4.01
+  },
+  "missing_top": {
+    "DEBTINC": 21.26,
+    "DEROG": 11.88,
+    "DELINQ": 9.73,
+    "MORTDUE": 8.69,
+    "YOJ": 8.64,
+    "NINQ": 8.56,
+    "CLAGE": 5.17,
+    "JOB": 4.68,
+    "REASON": 4.23,
+    "CLNO": 3.72
+  },
+  "n_numeric_abs_skew_gt2": 6,
+  "n_numeric": 10,
+  "max_abs_skew": 5.319,
+  "top_auc": {
+    "DELINQ": 0.672,
+    "DEBTINC": 0.651,
+    "CLAGE": 0.635,
+    "DEROG": 0.616,
+    "NINQ": 0.602
+  },
+  "informative_missing": [
+    {
+      "feature": "VALUE",
+      "missing_pct": 1.88,
+      "bad_rate_if_missing": 93.75,
+      "bad_rate_if_present": 18.54,
+      "gap": 75.21
+    },
+    {
+      "feature": "DEBTINC",
+      "missing_pct": 21.26,
+      "bad_rate_if_missing": 62.04,
+      "bad_rate_if_present": 8.59,
+      "gap": 53.45
+    },
+    {
+      "feature": "JOB",
+      "missing_pct": 4.68,
+      "bad_rate_if_missing": 8.24,
+      "bad_rate_if_present": 20.52,
+      "gap": -12.28
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "lending_club",
+  "overview": {
+    "rows": 1348099.0,
+    "features": 23.0,
+    "numeric_features": 16.0,
+    "categorical_features": 7.0,
+    "duplicate_rows": 0.0,
+    "cells_missing_pct": 0.41,
+    "features_with_missing": 11.0
+  },
+  "target": {
+    "n": 1348099,
+    "n_bad": 269360,
+    "n_good": 1078739,
+    "bad_rate_pct": 19.98,
+    "imbalance_ratio": 4.0
+  },
+  "missing_top": {
+    "emp_length": 5.83,
+    "mort_acc": 3.71,
+    "pub_rec_bankruptcies": 0.1,
+    "revol_util": 0.07,
+    "dti": 0.03
+  },
+  "n_numeric_abs_skew_gt2": 7,
+  "n_numeric": 16,
+  "max_abs_skew": 46.24,
+  "top_auc": {
+    "int_rate": 0.683,
+    "fico_range_low": 0.593,
+    "dti": 0.577,
+    "mort_acc": 0.556,
+    "loan_amnt": 0.551
+  },
+  "resolved_rows": 1348099,
+  "all_rows": 2260668,
+  "unresolved_pct": 40.37
+}

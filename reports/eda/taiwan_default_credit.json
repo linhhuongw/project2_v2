@@ -1,0 +1,30 @@
+{
+  "name": "taiwan_default_credit",
+  "overview": {
+    "rows": 30000.0,
+    "features": 24.0,
+    "numeric_features": 24.0,
+    "categorical_features": 0.0,
+    "duplicate_rows": 0.0,
+    "cells_missing_pct": 0.0,
+    "features_with_missing": 0.0
+  },
+  "target": {
+    "n": 30000,
+    "n_bad": 6636,
+    "n_good": 23364,
+    "bad_rate_pct": 22.12,
+    "imbalance_ratio": 3.52
+  },
+  "missing_top": {},
+  "n_numeric_abs_skew_gt2": 12,
+  "n_numeric": 23,
+  "max_abs_skew": 30.452,
+  "top_auc": {
+    "PAY_0": 0.69,
+    "PAY_2": 0.639,
+    "PAY_3": 0.624,
+    "LIMIT_BAL": 0.618,
+    "PAY_AMT1": 0.611
+  }
+}

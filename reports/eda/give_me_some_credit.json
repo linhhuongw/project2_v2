@@ -1,0 +1,33 @@
+{
+  "name": "give_me_some_credit",
+  "overview": {
+    "rows": 150000.0,
+    "features": 10.0,
+    "numeric_features": 10.0,
+    "categorical_features": 0.0,
+    "duplicate_rows": 609.0,
+    "cells_missing_pct": 2.04,
+    "features_with_missing": 2.0
+  },
+  "target": {
+    "n": 150000,
+    "n_bad": 10026,
+    "n_good": 139974,
+    "bad_rate_pct": 6.68,
+    "imbalance_ratio": 13.96
+  },
+  "missing_top": {
+    "MonthlyIncome": 19.82,
+    "NumberOfDependents": 2.62
+  },
+  "n_numeric_abs_skew_gt2": 7,
+  "n_numeric": 10,
+  "max_abs_skew": 114.039,
+  "top_auc": {
+    "RevolvingUtilizationOfUnsecuredLines": 0.778,
+    "NumberOfTime30-59DaysPastDueNotWorse": 0.69,
+    "NumberOfTimes90DaysLate": 0.657,
+    "age": 0.635,
+    "NumberOfTime60-89DaysPastDueNotWorse": 0.622
+  }
+}

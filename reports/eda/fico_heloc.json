@@ -1,0 +1,30 @@
+{
+  "name": "fico_heloc",
+  "overview": {
+    "rows": 9871.0,
+    "features": 23.0,
+    "numeric_features": 23.0,
+    "categorical_features": 0.0,
+    "duplicate_rows": 1.0,
+    "cells_missing_pct": 0.0,
+    "features_with_missing": 0.0
+  },
+  "target": {
+    "n": 9871,
+    "n_bad": 5136,
+    "n_good": 4735,
+    "bad_rate_pct": 52.03,
+    "imbalance_ratio": 0.92
+  },
+  "missing_top": {},
+  "n_numeric_abs_skew_gt2": 6,
+  "n_numeric": 23,
+  "max_abs_skew": 7.088,
+  "top_auc": {
+    "ExternalRiskEstimate": 0.769,
+    "NetFractionRevolvingBurden": 0.685,
+    "PercentTradesWBalance": 0.662,
+    "PercentTradesNeverDelq": 0.655,
+    "AverageMInFile": 0.651
+  }
+}
