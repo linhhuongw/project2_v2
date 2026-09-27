@@ -26,8 +26,13 @@ Copy the raw datasets into `data/raw/` (same layout as `project2_v1/data/raw`), 
 ```bash
 python -m src.data.make_interim                  # raw -> data/interim (CSV / Parquet, ~30 s)
 python scripts/build_eda_notebooks.py --execute  # build + run notebooks/eda_*.ipynb (~1 min)
-python -m src.data.make_splits                   # 5-fold train/val/test splits -> data/splits (~20 s)
+python -m src.data.make_splits                   # 5-fold train/val/test splits -> data/splits (~3 min)
+python -m src.features.make_processed --family classic  # tier B.1 for LR/classic ML -> data/processed/classic (~30 s)
+python -m src.models.train_classic --run lr_default     # Logistic Regression (default params) -> reports/models/lr_default
+python -m src.models.report_classic --run lr_default    # tables + figures (report.md is hand-written)
 ```
+
+Or run every stage in order: `python run_pipeline.py` (see `python run_pipeline.py --help`).
 
 EDA outputs: figures in `reports/figures/eda/`, per-dataset summaries in `reports/eda/*.json`,
 comparison table in `reports/tables/eda_comparison.csv`, and the data report in `report/data_report.md`.
