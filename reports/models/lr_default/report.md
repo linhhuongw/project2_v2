@@ -94,8 +94,8 @@ AUC 0,698 của GMSC **thấp hơn cả AUC đơn biến** của biến mạnh n
 
 ![ROC và calibration](figures/roc_calibration.png)
 
-- **5 bộ CV** có xác suất dự đoán trung bình gần như bằng tỷ lệ vỡ nợ thực (chênh ≤ 0,6 điểm %), đúng kỳ vọng với LR không cân bằng lớp khi train và test cùng phân phối.
-- **Lending Club** dự đoán thấp hơn thực tế: xác suất trung bình 13,5% so với tỷ lệ vỡ nợ 2015 là **14,9%** (mô hình fit trên 2013–2014 có tỷ lệ 13,1%). Đây là **trôi dạt theo thời gian** đã dự báo trong `preprocessing_v1.md` — mô hình tách hạng ổn nhưng cần hiệu chỉnh lại mức rủi ro khi áp dụng cho năm sau.
+- **6 bộ CV** có xác suất dự đoán trung bình gần như bằng tỷ lệ vỡ nợ thực (chênh ≤ 0,6 điểm %), đúng kỳ vọng với LR không cân bằng lớp khi train và test cùng phân phối.
+- **Lending Club** dự đoán thấp hơn thực tế: xác suất trung bình 13,5% so với tỷ lệ vỡ nợ 2015 là **14,9%** (mô hình fit trên 2013–2014 có tỷ lệ 13,2%). Đây là **trôi dạt theo thời gian** đã dự báo trong `preprocessing_v1.md` — mô hình tách hạng ổn nhưng cần hiệu chỉnh lại mức rủi ro khi áp dụng cho năm sau.
 - **South German** quá tự tin ở nhóm rủi ro cao (dự đoán ~0,8 nhưng thực tế ~0,68) — hệ quả của overfit ở mục 3.1.
 - **Taiwan** lệch ở vùng giữa (dự đoán 0,2–0,25 nhưng thực tế ~0,12): quan hệ không tuyến tính của các biến trạng thái thanh toán `PAY_*` (được giữ là biến số theo đặc tả) mà LR không nắm được.
 
