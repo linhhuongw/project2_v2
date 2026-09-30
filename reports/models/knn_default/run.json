@@ -1,0 +1,241 @@
+{
+  "model": "KNeighborsClassifier(n_jobs=-1)",
+  "seed": 42,
+  "datasets": {
+    "give_me_some_credit": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.02,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.74
+        },
+        "fold2": {
+          "fit_seconds": 0.02,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.74
+        },
+        "fold3": {
+          "fit_seconds": 0.02,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.77
+        },
+        "fold4": {
+          "fit_seconds": 0.02,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.81
+        },
+        "fold5": {
+          "fit_seconds": 0.02,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.67
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "taiwan_default_credit": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.23
+        },
+        "fold2": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.16
+        },
+        "fold3": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.1
+        },
+        "fold4": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.1
+        },
+        "fold5": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.1
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "home_credit": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.04,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 39.12
+        },
+        "fold2": {
+          "fit_seconds": 0.04,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 38.68
+        },
+        "fold3": {
+          "fit_seconds": 0.05,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 37.12
+        },
+        "fold4": {
+          "fit_seconds": 0.05,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 35.18
+        },
+        "fold5": {
+          "fit_seconds": 0.04,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 34.91
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "hmeq": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.01
+        },
+        "fold2": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.01
+        },
+        "fold3": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.01
+        },
+        "fold4": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.01
+        },
+        "fold5": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.01
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "south_german_credit": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold2": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold3": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold4": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold5": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "fico_heloc": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.02
+        },
+        "fold2": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.02
+        },
+        "fold3": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.02
+        },
+        "fold4": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.02
+        },
+        "fold5": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.02
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "lending_club_B": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.02,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 54.88
+        },
+        "refit": {
+          "fit_seconds": 0.05,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 95.03
+        }
+      },
+      "bootstrap_test_auc": {
+        "n": 1000,
+        "mean": 0.5781371207356444,
+        "std": 0.0013833808317214949,
+        "ci95": [
+          0.5753736216533057,
+          0.5809167506066182
+        ]
+      }
+    }
+  }
+}

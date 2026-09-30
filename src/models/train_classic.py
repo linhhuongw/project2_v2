@@ -1,7 +1,12 @@
 """Train classic-ML models on the tier-B.1 matrices (data/processed/classic) and evaluate them.
 
-Currently: Logistic Regression with scikit-learn default hyperparameters (C=1.0, L2, lbfgs), except
-max_iter=2000 as in configs/preprocessing_v1.md B.3 (solver budget, not a tuned hyperparameter).
+Models (scikit-learn defaults, no tuning; all use the same folds and B.1 matrices):
+  lr_default   LogisticRegression (C=1.0, L2, lbfgs); max_iter=2000 as in preprocessing_v1.md B.3
+  knn_default  KNeighborsClassifier (k=5, uniform weights, Euclidean)
+  rf_default   RandomForestClassifier (100 fully grown trees, sqrt features)
+  nb_default   GaussianNB
+KNN is not scored on its own training set: every training point is its own nearest neighbour,
+so training AUC is meaningless, and it would cost an n_train x n_train distance computation.
 
 Per dataset and fold: fit on train, choose the F1-maximising threshold on validation, evaluate on
 validation and test. Lending Club (single time split) also: refit on train + val and evaluate on
@@ -26,7 +31,10 @@ import warnings
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 
 from src.data.datasets import ROOT, SPECS
 from src.data.splits import load_meta
@@ -38,7 +46,11 @@ SEED = 42
 
 MODELS = {
     "lr_default": lambda: LogisticRegression(max_iter=2000, random_state=SEED),
+    "knn_default": lambda: KNeighborsClassifier(n_jobs=-1),
+    "rf_default": lambda: RandomForestClassifier(n_jobs=-1, random_state=SEED),
+    "nb_default": lambda: GaussianNB(),
 }
+SKIP_TRAIN_SCORE = {"knn_default"}
 
 
 def load_parts(path, parts):
@@ -54,8 +66,8 @@ def fit(model_name, X, y):
         warnings.simplefilter("always", ConvergenceWarning)
         model.fit(X, y)
     converged = not any(issubclass(w.category, ConvergenceWarning) for w in caught)
-    return model, {"fit_seconds": round(time.perf_counter() - t0, 2),
-                   "n_iter": int(np.max(model.n_iter_)), "converged": converged}
+    n_iter = int(np.max(model.n_iter_)) if hasattr(model, "n_iter_") else None
+    return model, {"fit_seconds": round(time.perf_counter() - t0, 2), "n_iter": n_iter, "converged": converged}
 
 
 def run_dataset(name, model_name):
@@ -67,10 +79,13 @@ def run_dataset(name, model_name):
         d = load_parts(base / f"fold{k}", ("train", "val", "test"))
         model, info = fit(model_name, *d["train"][:2])
         fits[f"fold{k}"] = info
-        p = {part: model.predict_proba(d[part][0])[:, 1] for part in ("train", "val", "test")}
+        t0 = time.perf_counter()
+        parts = ("val", "test") if model_name in SKIP_TRAIN_SCORE else ("train", "val", "test")
+        p = {part: model.predict_proba(d[part][0])[:, 1] for part in parts}
+        info["predict_seconds"] = round(time.perf_counter() - t0, 2)
         thr = f1_threshold(d["val"][1], p["val"])
         thresholds[k] = thr
-        for part in ("train", "val", "test"):
+        for part in parts:
             rows.append({"dataset": name, "fold": k, "part": part, "fit": "train",
                          **score(d[part][1], p[part], thr)})
         for part in ("val", "test"):
@@ -82,7 +97,9 @@ def run_dataset(name, model_name):
         d = load_parts(base / "refit", ("trainval", "test"))
         model, info = fit(model_name, *d["trainval"][:2])
         fits["refit"] = info
+        t0 = time.perf_counter()
         p_test = model.predict_proba(d["test"][0])[:, 1]
+        info["predict_seconds"] = round(time.perf_counter() - t0, 2)
         rows.append({"dataset": name, "fold": 1, "part": "test", "fit": "train+val",
                      **score(d["test"][1], p_test, thresholds[1])})
         preds.append(pd.DataFrame({"row_id": d["test"][2], "fold": 1, "part": "test", "fit": "train+val",
@@ -106,7 +123,7 @@ def summarise(fm: pd.DataFrame) -> pd.DataFrame:
             row[f"{m}_std"] = final[m].std(ddof=1) if len(final) > 1 else np.nan
         row["bad_rate"] = final["bad_rate"].mean()
         row["mean_pred"] = final["mean_pred"].mean()
-        row["train_auc"] = g[(g.part == "train")]["auc"].mean()
+        row["train_auc"] = g[(g.part == "train")]["auc"].mean() if (g.part == "train").any() else np.nan
         row["val_auc"] = g[(g.part == "val")]["auc"].mean()
         out.append(row)
     return pd.DataFrame(out)
@@ -136,7 +153,7 @@ def main(argv=None):
         print(f"[{name}] test AUC {np.mean([r['auc'] for r in final]):.4f}"
               + (f" ± {np.std([r['auc'] for r in final], ddof=1):.4f}" if len(final) > 1 else "")
               + (f" (bootstrap 95% CI {boot['ci95'][0]:.4f}–{boot['ci95'][1]:.4f})" if boot else "")
-              + f" | converged {conv} | max iter {max(f['n_iter'] for f in fits.values())}"
+              + f" | converged {conv}"
               + f" | {time.perf_counter() - t0:.1f}s")
 
     fm = pd.DataFrame(all_rows)

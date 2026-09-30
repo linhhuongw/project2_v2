@@ -73,7 +73,7 @@ Kết quả:
 | Home Credit | `FLAG_MOBIL` ở fold 2, 4, 5 (chỉ có một dòng khác giá trị) | Không |
 | Lending Club | 31 cột: 29 cột trống ở train (12 cột người đồng vay `sec_app_*`, 3 cột hồ sơ đồng vay, 14 trường bureau có từ khoảng 2015–2016) và 2 cột hằng số (`policy_code`, `disbursement_method`) | **Không** (trước khi lọc năm 2013 có 22 cột lệch ~31 điểm) |
 
-## 4.4. Tầng B.1 — Tiền xử lý Baesens (nhánh cho Logistic Regression)
+## 4.4. Tầng B.1 — Tiền xử lý Baesens (nhánh classic ML)
 
 | Bước | Biến số | Biến phân loại |
 |---|---|---|
@@ -104,9 +104,20 @@ Số đặc trưng sau B.1:
 | FICO HELOC | 21 số + 2 phân loại | 37 |
 | Lending Club | 62 số + 8 phân loại | 184 (188 khi fit lại trên train + validation) |
 
-## 4.5. Mô hình: Logistic Regression
+## 4.5. Mô hình classic ML
 
-Mô hình cơ sở là Logistic Regression của scikit-learn với **tham số mặc định**: `C = 1,0`, phạt L2, solver `lbfgs`, không `class_weight`. Giới hạn số vòng lặp đặt `max_iter = 2000` theo khung code của đặc tả; trên thực tế mọi lần fit hội tụ sau tối đa 89 vòng (dưới giới hạn mặc định 100 của scikit-learn), nên kết quả trùng với `LogisticRegression()` mặc định hoàn toàn. Chưa tinh chỉnh siêu tham số ở bước này.
+Bốn mô hình thuộc nhóm classic ML của Baesens được huấn luyện với **tham số mặc định** của scikit-learn 1.7, chưa tinh chỉnh. Cả bốn dùng **cùng các fold** và **cùng ma trận đặc trưng** sau B.1 (one-hot, chuẩn hóa), nên khác biệt về kết quả chỉ đến từ mô hình.
+
+| Mô hình | Cấu hình mặc định | Đặc điểm |
+|---|---|---|
+| **Logistic Regression (LR)** | `C = 1,0`, phạt L2, solver `lbfgs`; `max_iter = 2000` theo khung code của đặc tả | Tuyến tính, dễ diễn giải; là chuẩn của ngành chấm điểm tín dụng |
+| **K-Nearest Neighbors (KNN)** | `k = 5`, trọng số đều, khoảng cách Euclid | Phi tham số, dựa trên khoảng cách; xác suất chỉ nhận 6 giá trị (0; 0,2; …; 1) |
+| **Random Forest (RF)** | 100 cây, cây phát triển hết độ sâu, mỗi lần tách xét √p đặc trưng | Tổ hợp cây quyết định; nắm được quan hệ phi tuyến và tương tác; không nhạy với ngoại lai |
+| **Naive Bayes (NB)** | `GaussianNB` | Giả định các đặc trưng độc lập có điều kiện và có phân phối chuẩn |
+
+Với LR, mọi lần fit hội tụ sau tối đa 89 vòng (dưới giới hạn mặc định 100 của scikit-learn), nên kết quả trùng với `LogisticRegression()` mặc định hoàn toàn. KNN **không được chấm điểm trên chính tập train**, vì mỗi điểm train là láng giềng gần nhất của chính nó (AUC train vô nghĩa) và phép tính khoảng cách train × train rất tốn kém.
+
+SVM (mô hình classic thứ năm của Baesens) chưa được đưa vào: SVM hạt nhân có chi phí huấn luyện tăng xấp xỉ theo bình phương số dòng, không khả thi trên Home Credit và Lending Club (100–263 nghìn dòng train) nếu không lấy mẫu con, mà lấy mẫu con thì so sánh không còn cùng điều kiện.
 
 ## 4.6. Độ đo đánh giá
 
@@ -118,3 +129,14 @@ Mô hình cơ sở là Logistic Regression của scikit-learn với **tham số 
 | Theo ngưỡng | Precision, Recall, F1, Accuracy | Tại ngưỡng tối đa hóa F1 **trên validation**, áp nguyên sang test |
 
 Với 6 bộ dữ liệu CV, kết quả được báo cáo là trung bình ± độ lệch chuẩn trên 5 fold test. Với Lending Club, kết quả là mô hình fit lại trên train + validation, kèm khoảng tin cậy 95% của AUC bằng bootstrap.
+
+## 4.7. So sánh mô hình
+
+Theo đặc tả, các mô hình được so sánh trên 7 bộ dữ liệu bằng:
+
+1. **Hạng trung bình**: trên mỗi bộ, xếp hạng các mô hình theo độ đo (1 = tốt nhất), rồi lấy trung bình qua các bộ.
+2. **Kiểm định Friedman** kèm hiệu chỉnh **Iman–Davenport**: kiểm tra giả thuyết "mọi mô hình có hạng như nhau".
+3. **Wilcoxon signed-rank từng cặp** với hiệu chỉnh **Holm** cho nhiều phép so sánh.
+4. Bổ sung ở mức từng bộ dữ liệu: số fold mô hình thắng LR (6 bộ CV); với Lending Club, **bootstrap ghép cặp** (1.000 lần) của chênh lệch AUC trên cùng 282.787 dòng test.
+
+Với chỉ 7 bộ dữ liệu, Wilcoxon có năng lực thống kê thấp: p nhỏ nhất có thể đạt được (khi một mô hình thắng ở cả 7 bộ) là 0,0156 trước hiệu chỉnh; sau hiệu chỉnh Holm cho 6 cặp, không cặp nào có thể xuống dưới 0,05 nếu thứ tự hai mô hình không nhất quán tuyệt đối.

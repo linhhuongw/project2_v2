@@ -1,6 +1,6 @@
-# 6. Kết quả — Logistic Regression
+# 6. Kết quả
 
-Kết quả của mô hình cơ sở Logistic Regression với tham số mặc định. Số liệu gốc nằm trong `reports/models/lr_default/` (`summary.csv`, `fold_metrics.csv`, `run.json`).
+Mục 6.1–6.6 phân tích mô hình cơ sở Logistic Regression; mục 6.7 so sánh bốn mô hình classic ML (LR, KNN, RF, NB), tất cả với tham số mặc định. Số liệu gốc nằm trong `reports/models/lr_default/` (`summary.csv`, `fold_metrics.csv`, `run.json`).
 
 ## 6.1. Kết quả chính
 
@@ -112,3 +112,118 @@ Với GMSC, gần như toàn bộ khoảng cách là do ngoại lai. Kết quả
 2. Theo đặc tả, không cắt ngoại lai, nên LR của GMSC bị đánh giá thấp nghiêm trọng (mục 6.3).
 3. Ngưỡng F1 của Lending Club lấy từ mô hình fit trên 2013 (validation 2014) và áp cho mô hình fit lại trên 2013–2014, vì mô hình fit lại không còn phần validation.
 4. Lending Club chỉ có một lần chia; khoảng tin cậy bootstrap không phản ánh biến động do chọn năm.
+
+## 6.7. So sánh các mô hình classic ML
+
+Bốn mô hình dùng cùng các fold, cùng ma trận đặc trưng và cùng cách đánh giá (chương 4), nên chênh lệch chỉ đến từ mô hình. Số liệu gốc: `reports/models/comparison/` (`tables.md`, `auc.csv`, `ranks.csv`, `stats.json`).
+
+![AUC test của bốn mô hình trên 7 bộ dữ liệu](../../reports/models/comparison/figures/auc_by_model.png)
+
+### AUC trên test
+
+| Bộ dữ liệu | LR | KNN | RF | NB | Tốt nhất |
+|---|---|---|---|---|---|
+| GMSC | 0,6981 ± 0,0110 | 0,6859 ± 0,0038 | **0,8399 ± 0,0047** | 0,7042 ± 0,0119 | RF |
+| Taiwan | 0,7237 ± 0,0082 | 0,6985 ± 0,0126 | **0,7633 ± 0,0081** | 0,7323 ± 0,0142 | RF |
+| Home Credit | **0,7461 ± 0,0022** | 0,5819 ± 0,0009 | 0,7084 ± 0,0030 | 0,5309 ± 0,0068 | LR |
+| HMEQ | 0,8030 ± 0,0161 | 0,8993 ± 0,0195 | **0,9703 ± 0,0060** | 0,7704 ± 0,0179 | RF |
+| South German | 0,7663 ± 0,0281 | 0,7084 ± 0,0431 | **0,7710 ± 0,0284** | 0,7157 ± 0,0414 | RF |
+| FICO HELOC | **0,8019 ± 0,0098** | 0,7427 ± 0,0075 | 0,7946 ± 0,0066 | 0,7587 ± 0,0069 | LR |
+| Lending Club | **0,7018** | 0,5782 | 0,6777 | 0,6744 | LR |
+| **Hạng trung bình** | 2,00 | 3,57 | **1,43** | 3,00 | |
+
+### Hạng trung bình theo từng độ đo (1 = tốt nhất)
+
+| Độ đo | LR | KNN | RF | NB |
+|---|---|---|---|---|
+| AUC / Gini | 2,00 | 3,57 | **1,43** | 3,00 |
+| KS | 2,00 | 3,29 | **1,57** | 3,14 |
+| AP | 1,71 | 3,29 | **1,43** | 3,57 |
+| F1 | 1,86 | 3,43 | **1,43** | 3,29 |
+| Brier | 1,71 | 2,86 | **1,43** | 4,00 |
+| LogLoss | **1,43** | 3,29 | 1,57 | 3,71 |
+
+Thứ tự **RF > LR > NB, KNN** giữ nguyên ở hầu hết các độ đo. Riêng LogLoss, LR xếp nhất vì xác suất của LR được hiệu chỉnh tốt nhất (mục 6.4), trong khi RF với cây phát triển hết độ sâu cho xác suất sát 0 hoặc 1 nhiều hơn.
+
+### Kiểm định thống kê
+
+| Kiểm định | Kết quả |
+|---|---|
+| Friedman (N = 7 bộ, k = 4 mô hình) | χ²_F = 11,74; p = 0,0083 |
+| Iman–Davenport | F = 7,61; **p = 0,0017** |
+
+→ Bác bỏ giả thuyết "bốn mô hình có hạng như nhau": có khác biệt có ý nghĩa thống kê giữa các mô hình.
+
+| Cặp (A vs B) | Số bộ A thắng / B thắng | Chênh AUC trung bình (A − B) | p | p (Holm) |
+|---|---|---|---|---|
+| RF vs KNN | 7 / 0 | +0,0900 | 0,0156 | 0,0938 |
+| RF vs NB | 7 / 0 | +0,0912 | 0,0156 | 0,0938 |
+| LR vs NB | 5 / 2 | +0,0506 | 0,0781 | 0,3125 |
+| LR vs KNN | 6 / 1 | +0,0494 | 0,1562 | 0,4688 |
+| RF vs LR | 4 / 3 | +0,0406 | 0,4688 | 0,9375 |
+| NB vs KNN | 5 / 2 | −0,0012 | 0,8125 | 0,9375 |
+
+- RF thắng KNN và NB ở **cả 7 bộ**, nhưng sau hiệu chỉnh Holm p = 0,094, chưa đạt mức 0,05. Đây là giới hạn của số bộ dữ liệu: với N = 7, p nhỏ nhất có thể có của Wilcoxon là 0,0156, và nhân với 6 cặp theo Holm thì không cặp nào có thể xuống dưới 0,05. Kết luận "RF tốt hơn KNN và NB" là nhất quán nhưng chưa được khẳng định thống kê ở mức từng cặp.
+- **RF và LR không khác biệt có ý nghĩa** (4 thắng / 3 thua, p = 0,47): mỗi mô hình mạnh trên một nhóm bộ dữ liệu khác nhau (xem dưới).
+
+### Ở mức từng bộ dữ liệu
+
+Số fold (trên 5) mô hình thắng LR về AUC test:
+
+| Bộ dữ liệu | KNN | RF | NB |
+|---|---|---|---|
+| GMSC | 1/5 | **5/5** | 4/5 |
+| Taiwan | 0/5 | **5/5** | **5/5** |
+| Home Credit | 0/5 | 0/5 | 0/5 |
+| HMEQ | **5/5** | **5/5** | 0/5 |
+| South German | 0/5 | 3/5 | 0/5 |
+| FICO HELOC | 0/5 | 1/5 | 0/5 |
+
+Lending Club — chênh lệch AUC so với LR trên cùng 282.787 dòng test (bootstrap ghép cặp, 1.000 lần):
+
+| Mô hình | Chênh AUC | KTC 95% |
+|---|---|---|
+| KNN − LR | −0,1237 | −0,1268 đến −0,1207 |
+| RF − LR | −0,0241 | −0,0261 đến −0,0221 |
+| NB − LR | −0,0270 | −0,0285 đến −0,0253 |
+
+Trên Lending Club, LR tốt hơn cả ba mô hình còn lại một cách rõ ràng (mọi khoảng tin cậy đều nằm hoàn toàn dưới 0).
+
+### Nhận xét theo mô hình
+
+**Random Forest — tốt nhất nói chung, mạnh ở dữ liệu nhỏ và vừa có quan hệ phi tuyến.**
+
+- Thắng rõ trên **GMSC** (0,840 so với 0,698 của LR): RF chia theo ngưỡng nên không bị ngoại lai ảnh hưởng, khai thác được biến tỷ lệ sử dụng hạn mức mà LR bỏ qua (mục 6.3). Kết quả này gần với mức LR đạt được khi cắt ngoại lai ở phân tích phụ (0,852), củng cố nhận định rằng khoảng cách của LR trên GMSC chủ yếu do ngoại lai.
+- Thắng rất lớn trên **HMEQ** (0,970 so với 0,803). Mức tăng này không đến từ mẫu giá trị thiếu: trên các dòng test không thiếu giá trị nào, RF vẫn đạt 0,972 so với 0,798 của LR, và RF chỉ huấn luyện trên các dòng đầy đủ vẫn đạt 0,957. Biến quan trọng nhất là tỷ lệ nợ/thu nhập `DEBTINC` (22% độ quan trọng), có quan hệ phi tuyến với nhãn.
+- Thắng trên **Taiwan** (0,763): nắm được quan hệ phi tuyến của các biến trạng thái thanh toán `PAY_*`.
+- **Thua LR** trên Home Credit, HELOC và Lending Club — các bộ có nhiều đặc trưng (HELOC 37, Lending Club 184, Home Credit 250), tín hiệu phân tán, gần tuyến tính. Với tham số mặc định, mỗi cây phát triển hết độ sâu nên **AUC train = 1,000 ở mọi bộ** (học thuộc dữ liệu train); trên các bộ tín hiệu yếu và nhiễu, việc học thuộc này làm giảm khả năng tổng quát. Đây là mô hình hưởng lợi nhiều nhất khi tinh chỉnh (độ sâu, số dòng tối thiểu ở lá).
+
+**Logistic Regression — ổn định và được hiệu chỉnh tốt nhất.**
+
+- Tốt nhất trên 3 bộ lớn/rộng (Home Credit, HELOC, Lending Club) và thắng khẳng định trên Lending Club.
+- Xác suất dự đoán trung bình khớp tỷ lệ xấu thực trong khoảng 0,6 điểm % ở mọi bộ CV; xếp nhất về LogLoss.
+- Điểm yếu: không nắm được quan hệ phi tuyến (HMEQ, Taiwan) và nhạy với ngoại lai (GMSC).
+
+**K-Nearest Neighbors — tệ nhất, sụp đổ khi số chiều lớn.**
+
+- Trên Home Credit (250 đặc trưng) và Lending Club (184 đặc trưng), AUC chỉ còn 0,58: với số chiều lớn, khoảng cách Euclid giữa các điểm gần như bằng nhau ("lời nguyền số chiều"), lại bị chi phối bởi các biến có ngoại lai lớn sau chuẩn hóa.
+- Ngược lại, KNN tốt thứ hai trên HMEQ (0,899, hơn LR 0,10): HMEQ có ít chiều (20) và cấu trúc cục bộ rõ, cùng hướng với kết quả của RF. Mức tăng lớn của cả hai mô hình dựa trên láng giềng/phân vùng trên HMEQ có thể một phần do các hồ sơ gần giống nhau trong dữ liệu; điều này chưa được kiểm tra (việc nhóm dòng trùng chỉ xử lý các dòng **giống hệt** nhau).
+- Chậm nhất khi dự đoán (chiếm khoảng 80% tổng thời gian chạy, mục 5.3).
+
+**Naive Bayes — xếp hạng kém và xác suất sai lệch nghiêm trọng.**
+
+- Thất bại trên **Home Credit** (AUC 0,531, gần ngẫu nhiên). Nguyên nhân: giả định các đặc trưng độc lập bị vi phạm nặng — Home Credit có nhiều nhóm cột gần trùng nhau (các biến nhà ở dạng `*_AVG`/`*_MODE`/`*_MEDI`), nên tích các xác suất có điều kiện bị bão hòa: 98,5% dự đoán rơi sát 0 hoặc 1, thứ tự xếp hạng bị phá vỡ. Cắt ngoại lai không khắc phục được (0,547).
+- Xác suất sai lệch rất lớn: trung bình xác suất dự đoán cao hơn tỷ lệ xấu thực **69 điểm %** trên Taiwan và **85 điểm %** trên Home Credit, nên NB xếp cuối về Brier ở mọi bộ; F1 trên Home Credit bằng 0.
+- Vẫn khá trên các bộ ít biến và ít tương quan (Taiwan 0,732, hơn LR).
+
+### Kết luận so sánh
+
+| Nhóm bộ dữ liệu | Mô hình tốt nhất | Lý do |
+|---|---|---|
+| Nhỏ và vừa, ít đặc trưng, quan hệ phi tuyến hoặc có ngoại lai (GMSC, Taiwan, HMEQ, South German) | **RF** | Chia theo ngưỡng: không nhạy với ngoại lai, nắm được phi tuyến và tương tác |
+| Lớn hoặc rộng, tín hiệu phân tán, có trôi dạt theo thời gian (Home Credit, HELOC, Lending Club) | **LR** | Mô hình đơn giản, ổn định, ít học thuộc nhiễu; xác suất được hiệu chỉnh tốt |
+| — | KNN, NB | Không phù hợp làm mô hình chính: KNN hỏng khi số chiều lớn; NB vi phạm giả định độc lập và cho xác suất sai lệch |
+
+Với tham số mặc định, **RF có hạng trung bình tốt nhất (1,43)** và khác biệt giữa các mô hình là có ý nghĩa thống kê theo Friedman (p = 0,0017); nhưng RF **không vượt trội LR một cách nhất quán** (4 thắng / 3 thua). Hai hướng tiếp theo có khả năng thay đổi thứ tự: tinh chỉnh tham số (đặc biệt độ sâu cây của RF và tham số phạt `C` của LR) và các mô hình GBDT.
+
+**Giới hạn của so sánh:** tất cả là tham số mặc định, chưa tinh chỉnh; mới có 7 bộ dữ liệu nên năng lực của kiểm định từng cặp thấp; chưa có SVM (mục 4.5); ma trận đặc trưng one-hot và chuẩn hóa là lựa chọn của đặc tả cho nhóm classic, không nhất thiết tối ưu cho từng mô hình (ví dụ NB và RF không cần chuẩn hóa).

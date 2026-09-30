@@ -28,8 +28,9 @@ python -m src.data.make_interim                  # raw -> data/interim (CSV / Pa
 python scripts/build_eda_notebooks.py --execute  # build + run notebooks/eda_*.ipynb (~1 min)
 python -m src.data.make_splits                   # 5-fold train/val/test splits -> data/splits (~3 min)
 python -m src.features.make_processed --family classic  # tier B.1 for LR/classic ML -> data/processed/classic (~30 s)
-python -m src.models.train_classic --run lr_default     # Logistic Regression (default params) -> reports/models/lr_default
-python -m src.models.report_classic --run lr_default    # tables + figures (report.md is hand-written)
+python -m src.models.train_classic --run lr_default     # also knn_default, rf_default, nb_default -> reports/models/<run>
+python -m src.models.report_classic --run lr_default    # tables + figures per run
+python -m src.models.compare_models                     # ranks, Friedman / Wilcoxon-Holm -> reports/models/comparison
 ```
 
 Or run every stage in order: `python run_pipeline.py` (see `python run_pipeline.py --help`).

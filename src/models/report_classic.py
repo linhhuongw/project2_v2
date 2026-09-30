@@ -50,8 +50,10 @@ def tables(out, summary, fm, run) -> str:
               "| Dataset | AUC train | AUC val | AUC test | Chênh train − test | Tỷ lệ vỡ nợ test | Xác suất dự đoán TB |",
               "|---|---|---|---|---|---|---|"]
     for _, r in summary.iterrows():
-        lines.append(f"| {LABELS[r.dataset]} | {r.train_auc:.4f} | {r.val_auc:.4f} | {r.auc:.4f} | "
-                     f"{r.train_auc - r.auc:+.4f} | {100 * r.bad_rate:.2f}% | {100 * r.mean_pred:.2f}% |")
+        tr = "—" if np.isnan(r.train_auc) else f"{r.train_auc:.4f}"
+        gap = "—" if np.isnan(r.train_auc) else f"{r.train_auc - r.auc:+.4f}"
+        lines.append(f"| {LABELS[r.dataset]} | {tr} | {r.val_auc:.4f} | {r.auc:.4f} | "
+                     f"{gap} | {100 * r.bad_rate:.2f}% | {100 * r.mean_pred:.2f}% |")
     lines += ["", "## Bảng 4 — AUC test từng fold", "",
               "| Dataset | Fold 1 | Fold 2 | Fold 3 | Fold 4 | Fold 5 |", "|---|---|---|---|---|---|"]
     t = fm[(fm.part == "test") & (fm.fit == "train")]
@@ -59,12 +61,15 @@ def tables(out, summary, fm, run) -> str:
         vals = [f"{v:.4f}" for v in g.sort_values("fold").auc]
         lines.append(f"| {LABELS[name]} | " + " | ".join(vals + [""] * (5 - len(vals))) + " |")
     lines += ["", "## Bảng 5 — Huấn luyện", "",
-              "| Dataset | Lần fit | Số vòng lặp tối đa | Hội tụ | Thời gian fit (s) |", "|---|---|---|---|---|"]
+              "| Dataset | Lần fit | Số vòng lặp tối đa | Hội tụ | Thời gian fit (s) | Thời gian dự đoán (s) |",
+              "|---|---|---|---|---|---|"]
     for name, d in run["datasets"].items():
         f = d["fits"]
-        lines.append(f"| {LABELS[name]} | {len(f)} | {max(v['n_iter'] for v in f.values())} | "
+        iters = [v["n_iter"] for v in f.values() if v.get("n_iter") is not None]
+        lines.append(f"| {LABELS[name]} | {len(f)} | {max(iters) if iters else '—'} | "
                      f"{'có' if all(v['converged'] for v in f.values()) else 'KHÔNG'} | "
-                     f"{sum(v['fit_seconds'] for v in f.values()):.1f} |")
+                     f"{sum(v['fit_seconds'] for v in f.values()):.1f} | "
+                     f"{sum(v.get('predict_seconds', 0) for v in f.values()):.1f} |")
     text = "\n".join(lines) + "\n"
     (out / "tables.md").write_text(text)
     return text
@@ -81,7 +86,7 @@ def figures(out, summary, preds):
         ax.text(a + 0.012, y, f"{a:.3f}", va="center", fontsize=8)
     ax.set_xlim(0.5, 0.9)
     ax.set_xlabel("AUC test (thanh lỗi = độ lệch chuẩn qua 5 fold)")
-    ax.set_title("Logistic Regression, tham số mặc định")
+    ax.set_title(f"{out.name}: tham số mặc định")
     fig.tight_layout()
     fig.savefig(fig_dir / "auc_by_dataset.png", dpi=130)
     plt.close(fig)

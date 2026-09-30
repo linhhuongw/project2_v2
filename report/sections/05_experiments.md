@@ -4,9 +4,9 @@
 
 | Mục | Giá trị |
 |---|---|
-| Mô hình | `LogisticRegression(max_iter=2000, random_state=42)`, các tham số khác mặc định (scikit-learn 1.7) |
+| Mô hình | LR, KNN, RF, NB — tham số mặc định của scikit-learn 1.7 (mục 4.5); `random_state = 42` cho LR và RF |
 | Tiền xử lý | Tầng A → chia dữ liệu → B.0 → B.1 nhánh classic (chương 4) |
-| Số lần fit | 5 fold × 6 bộ = 30; Lending Club: 2 (train 2013, và fit lại trên 2013–2014) |
+| Số lần fit mỗi mô hình | 5 fold × 6 bộ = 30; Lending Club: 2 (train 2013, và fit lại trên 2013–2014) |
 | Seed | 42 cho chia dữ liệu, mô hình và bootstrap |
 | Phần cứng | Máy tính cá nhân, CPU |
 
@@ -26,24 +26,29 @@ Kích thước các fold dao động nhẹ (vài chục dòng) vì việc chia t
 
 ## 5.3. Thời gian chạy
 
-| Bộ dữ liệu | Số vòng lặp tối đa | Hội tụ | Tổng thời gian fit (giây) |
-|---|---:|---|---:|
-| GMSC | 35 | Có | 0,5 |
-| Taiwan | 68 | Có | 0,3 |
-| Home Credit | 82 | Có | 9,3 |
-| HMEQ | 38 | Có | < 0,1 |
-| South German | 58 | Có | < 0,1 |
-| FICO HELOC | 47 | Có | 0,1 |
-| Lending Club | 89 | Có | 3,4 |
+Tổng thời gian fit và dự đoán của mỗi mô hình (giây, CPU 10 nhân):
 
-Toàn bộ bước huấn luyện và đánh giá (kể cả bootstrap) chạy trong khoảng 1 phút.
+| Bộ dữ liệu | LR | KNN | RF | NB |
+|---|---:|---:|---:|---:|
+| GMSC | 0,5 | 3,8 | 7,5 | 0,1 |
+| Taiwan | 0,3 | 0,7 | 2,2 | < 0,1 |
+| Home Credit | 9,3 | 185,2 | 40,6 | 2,4 |
+| HMEQ | < 0,1 | 0,1 | 0,6 | < 0,1 |
+| South German | < 0,1 | < 0,1 | 0,4 | < 0,1 |
+| FICO HELOC | 0,1 | 0,1 | 0,8 | < 0,1 |
+| Lending Club | 3,4 | 150,0 | 16,1 | 0,9 |
+| **Tổng** | **13,8** | **339,9** | **68,3** | **3,4** |
+
+- LR hội tụ ở mọi lần fit (tối đa 89 vòng lặp).
+- KNN gần như không tốn thời gian fit nhưng rất chậm khi dự đoán: mỗi dòng validation/test phải tính khoảng cách tới toàn bộ dòng train. KNN chiếm khoảng 80% tổng thời gian chạy của cả bốn mô hình (78% trên Home Credit, 88% trên Lending Club).
+- RF dùng tối đa khoảng 3 GB bộ nhớ trên Home Credit.
 
 ## 5.4. Tái lập
 
 Toàn bộ quy trình được đóng gói thành pipeline:
 
 ```bash
-python run_pipeline.py                        # interim → splits → preprocess → train → report
+python run_pipeline.py                        # interim → splits → preprocess → train → report → compare
 python run_pipeline.py --only train report    # chỉ huấn luyện và tạo bảng, hình (~1 phút)
 ```
 
@@ -52,7 +57,8 @@ python run_pipeline.py --only train report    # chỉ huấn luyện và tạo b
 | Chuyển đổi dữ liệu thô | `src/data/make_interim.py` | `data/interim/` |
 | Tầng A, chia dữ liệu, B.0 | `src/data/datasets.py`, `src/data/make_splits.py` | `data/splits/` |
 | Tầng B.1 | `src/features/preprocess.py`, `src/features/make_processed.py` | `data/processed/classic/` |
-| Huấn luyện, đánh giá | `src/models/train_classic.py`, `src/models/metrics.py` | `reports/models/lr_default/` |
-| Bảng, hình | `src/models/report_classic.py` | `reports/models/lr_default/tables.md`, `figures/` |
+| Huấn luyện, đánh giá | `src/models/train_classic.py`, `src/models/metrics.py` | `reports/models/<mô hình>_default/` |
+| Bảng, hình từng mô hình | `src/models/report_classic.py` | `reports/models/<mô hình>_default/tables.md`, `figures/` |
+| So sánh mô hình | `src/models/compare_models.py` | `reports/models/comparison/` |
 
-Dự đoán của từng dòng test được lưu trong `reports/models/lr_default/predictions/` để dùng cho các kiểm định thống kê khi so sánh với các mô hình khác.
+Dự đoán của từng dòng validation và test được lưu trong `reports/models/<mô hình>_default/predictions/`, dùng cho kiểm định bootstrap ghép cặp và các so sánh sau này.

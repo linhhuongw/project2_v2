@@ -9,8 +9,9 @@ Stages (configs/preprocessing_v1.md):
   interim     raw data -> data/interim (CSV / Parquet, target 1 = bad)
   splits      tier A + StratifiedGroupKFold / Lending Club time split + tier B.0 -> data/splits
   preprocess  tier B.1 for classic ML (median, standardise, one-hot; fit on train) -> data/processed/classic
-  train       Logistic Regression, default hyperparameters -> reports/models/lr_default
-  report      tables, figures and report.md for the LR run
+  train       LR, KNN, RF, NB with default hyperparameters -> reports/models/<model>_default
+  report      tables and figures per model run (report.md files are hand-written)
+  compare     model comparison: ranks, Friedman / Wilcoxon-Holm -> reports/models/comparison
 """
 
 import argparse
@@ -19,14 +20,17 @@ import time
 
 from src.data import make_interim, make_splits
 from src.features import make_processed
-from src.models import report_classic, train_classic
+from src.models import compare_models, report_classic, train_classic
+
+RUNS = ["lr_default", "knn_default", "rf_default", "nb_default"]
 
 STAGES = {
     "interim": lambda: make_interim.main([]),
     "splits": lambda: make_splits.main([]),
     "preprocess": lambda: make_processed.main(["--family", "classic"]),
-    "train": lambda: train_classic.main(["--run", "lr_default"]),
-    "report": lambda: report_classic.main(["--run", "lr_default"]),
+    "train": lambda: [train_classic.main(["--run", r]) for r in RUNS],
+    "report": lambda: [report_classic.main(["--run", r]) for r in RUNS],
+    "compare": lambda: compare_models.main([]),
 }
 
 
