@@ -1,6 +1,6 @@
 # 6. Kết quả
 
-Mục 6.1–6.6 phân tích mô hình cơ sở Logistic Regression; mục 6.7 so sánh bốn mô hình classic ML (LR, KNN, RF, NB), tất cả với tham số mặc định. Số liệu gốc nằm trong `reports/models/lr_default/` (`summary.csv`, `fold_metrics.csv`, `run.json`).
+Mục 6.1–6.6 phân tích mô hình cơ sở Logistic Regression; mục 6.7 so sánh bốn mô hình classic ML (LR, KNN, RF, NB) theo AUC; mục 6.8 so sánh theo precision, recall, F1; mục 6.9 trình bày learning curves. Tất cả mô hình dùng tham số mặc định. Số liệu gốc nằm trong `reports/models/lr_default/` (`summary.csv`, `fold_metrics.csv`, `run.json`).
 
 ## 6.1. Kết quả chính
 
@@ -125,11 +125,11 @@ Bốn mô hình dùng cùng các fold, cùng ma trận đặc trưng và cùng c
 |---|---|---|---|---|---|
 | GMSC | 0,6981 ± 0,0110 | 0,6859 ± 0,0038 | **0,8399 ± 0,0047** | 0,7042 ± 0,0119 | RF |
 | Taiwan | 0,7237 ± 0,0082 | 0,6985 ± 0,0126 | **0,7633 ± 0,0081** | 0,7323 ± 0,0142 | RF |
-| Home Credit | **0,7461 ± 0,0022** | 0,5819 ± 0,0009 | 0,7084 ± 0,0030 | 0,5309 ± 0,0068 | LR |
+| Home Credit | **0,7461 ± 0,0022** | 0,5819 ± 0,0009 | 0,7084 ± 0,0030 | 0,5310 ± 0,0066 | LR |
 | HMEQ | 0,8030 ± 0,0161 | 0,8993 ± 0,0195 | **0,9703 ± 0,0060** | 0,7704 ± 0,0179 | RF |
-| South German | 0,7663 ± 0,0281 | 0,7084 ± 0,0431 | **0,7710 ± 0,0284** | 0,7157 ± 0,0414 | RF |
+| South German | 0,7663 ± 0,0281 | 0,7084 ± 0,0431 | **0,7710 ± 0,0284** | 0,7156 ± 0,0414 | RF |
 | FICO HELOC | **0,8019 ± 0,0098** | 0,7427 ± 0,0075 | 0,7946 ± 0,0066 | 0,7587 ± 0,0069 | LR |
-| Lending Club | **0,7018** | 0,5782 | 0,6777 | 0,6744 | LR |
+| Lending Club | **0,7018** | 0,5782 | 0,6777 | 0,6749 | LR |
 | **Hạng trung bình** | 2,00 | 3,57 | **1,43** | 3,00 | |
 
 ### Hạng trung bình theo từng độ đo (1 = tốt nhất)
@@ -140,10 +140,12 @@ Bốn mô hình dùng cùng các fold, cùng ma trận đặc trưng và cùng c
 | KS | 2,00 | 3,29 | **1,57** | 3,14 |
 | AP | 1,71 | 3,29 | **1,43** | 3,57 |
 | F1 | 1,86 | 3,43 | **1,43** | 3,29 |
+| Precision | **1,57** | 3,14 | 1,86 | 3,43 |
+| Recall | 3,14 | 2,43 | 2,71 | **1,71** |
 | Brier | 1,71 | 2,86 | **1,43** | 4,00 |
 | LogLoss | **1,43** | 3,29 | 1,57 | 3,71 |
 
-Thứ tự **RF > LR > NB, KNN** giữ nguyên ở hầu hết các độ đo. Riêng LogLoss, LR xếp nhất vì xác suất của LR được hiệu chỉnh tốt nhất (mục 6.4), trong khi RF với cây phát triển hết độ sâu cho xác suất sát 0 hoặc 1 nhiều hơn.
+Thứ tự **RF > LR > NB, KNN** giữ nguyên ở hầu hết các độ đo; precision và recall được phân tích riêng ở mục 6.8. Riêng LogLoss, LR xếp nhất vì xác suất của LR được hiệu chỉnh tốt nhất (mục 6.4), trong khi RF với cây phát triển hết độ sâu cho xác suất sát 0 hoặc 1 nhiều hơn.
 
 ### Kiểm định thống kê
 
@@ -161,7 +163,7 @@ Thứ tự **RF > LR > NB, KNN** giữ nguyên ở hầu hết các độ đo. R
 | LR vs NB | 5 / 2 | +0,0506 | 0,0781 | 0,3125 |
 | LR vs KNN | 6 / 1 | +0,0494 | 0,1562 | 0,4688 |
 | RF vs LR | 4 / 3 | +0,0406 | 0,4688 | 0,9375 |
-| NB vs KNN | 5 / 2 | −0,0012 | 0,8125 | 0,9375 |
+| NB vs KNN | 5 / 2 | −0,0011 | 0,8125 | 0,9375 |
 
 - RF thắng KNN và NB ở **cả 7 bộ**, nhưng sau hiệu chỉnh Holm p = 0,094, chưa đạt mức 0,05. Đây là giới hạn của số bộ dữ liệu: với N = 7, p nhỏ nhất có thể có của Wilcoxon là 0,0156, và nhân với 6 cặp theo Holm thì không cặp nào có thể xuống dưới 0,05. Kết luận "RF tốt hơn KNN và NB" là nhất quán nhưng chưa được khẳng định thống kê ở mức từng cặp.
 - **RF và LR không khác biệt có ý nghĩa** (4 thắng / 3 thua, p = 0,47): mỗi mô hình mạnh trên một nhóm bộ dữ liệu khác nhau (xem dưới).
@@ -213,7 +215,7 @@ Trên Lending Club, LR tốt hơn cả ba mô hình còn lại một cách rõ r
 **Naive Bayes — xếp hạng kém và xác suất sai lệch nghiêm trọng.**
 
 - Thất bại trên **Home Credit** (AUC 0,531, gần ngẫu nhiên). Nguyên nhân: giả định các đặc trưng độc lập bị vi phạm nặng — Home Credit có nhiều nhóm cột gần trùng nhau (các biến nhà ở dạng `*_AVG`/`*_MODE`/`*_MEDI`), nên tích các xác suất có điều kiện bị bão hòa: 98,5% dự đoán rơi sát 0 hoặc 1, thứ tự xếp hạng bị phá vỡ. Cắt ngoại lai không khắc phục được (0,547).
-- Xác suất sai lệch rất lớn: trung bình xác suất dự đoán cao hơn tỷ lệ xấu thực **69 điểm %** trên Taiwan và **85 điểm %** trên Home Credit, nên NB xếp cuối về Brier ở mọi bộ; F1 trên Home Credit bằng 0.
+- Xác suất sai lệch rất lớn: trung bình xác suất dự đoán cao hơn tỷ lệ xấu thực **69 điểm %** trên Taiwan và **85 điểm %** trên Home Credit, nên NB xếp cuối về Brier ở mọi bộ; F1 trên Home Credit chỉ 0,157.
 - Vẫn khá trên các bộ ít biến và ít tương quan (Taiwan 0,732, hơn LR).
 
 ### Kết luận so sánh
@@ -227,3 +229,155 @@ Trên Lending Club, LR tốt hơn cả ba mô hình còn lại một cách rõ r
 Với tham số mặc định, **RF có hạng trung bình tốt nhất (1,43)** và khác biệt giữa các mô hình là có ý nghĩa thống kê theo Friedman (p = 0,0017); nhưng RF **không vượt trội LR một cách nhất quán** (4 thắng / 3 thua). Hai hướng tiếp theo có khả năng thay đổi thứ tự: tinh chỉnh tham số (đặc biệt độ sâu cây của RF và tham số phạt `C` của LR) và các mô hình GBDT.
 
 **Giới hạn của so sánh:** tất cả là tham số mặc định, chưa tinh chỉnh; mới có 7 bộ dữ liệu nên năng lực của kiểm định từng cặp thấp; chưa có SVM (mục 4.5); ma trận đặc trưng one-hot và chuẩn hóa là lựa chọn của đặc tả cho nhóm classic, không nhất thiết tối ưu cho từng mô hình (ví dụ NB và RF không cần chuẩn hóa).
+
+## 6.8. Precision, recall và F1
+
+Các độ đo này được tính tại **ngưỡng tối đa F1 chọn trên validation** của từng fold, rồi áp nguyên sang test. Khác với AUC (đánh giá toàn bộ thứ tự xếp hạng), chúng phản ánh một quyết định cụ thể "từ chối / chấp nhận": precision là tỷ lệ người bị gắn nhãn xấu thực sự xấu; recall là tỷ lệ người xấu bị phát hiện.
+
+![Precision, recall và F1 trên test](../../reports/models/comparison/figures/precision_recall_f1.png)
+
+### F1
+
+| Bộ dữ liệu | LR | KNN | RF | NB | Tốt nhất |
+|---|---|---|---|---|---|
+| GMSC | 0,312 ± 0,009 | 0,306 ± 0,004 | **0,417 ± 0,006** | 0,244 ± 0,009 | RF |
+| Taiwan | 0,508 ± 0,008 | 0,464 ± 0,012 | **0,526 ± 0,009** | 0,511 ± 0,008 | RF |
+| Home Credit | **0,291 ± 0,002** | 0,185 ± 0,003 | 0,268 ± 0,005 | 0,157 ± 0,003 | LR |
+| HMEQ | 0,539 ± 0,018 | 0,737 ± 0,019 | **0,813 ± 0,022** | 0,506 ± 0,022 | RF |
+| South German | 0,563 ± 0,034 | 0,521 ± 0,067 | **0,571 ± 0,039** | 0,562 ± 0,017 | RF |
+| FICO HELOC | **0,759 ± 0,006** | 0,732 ± 0,009 | 0,757 ± 0,005 | 0,744 ± 0,004 | LR |
+| Lending Club | **0,352** | 0,281 | 0,335 | 0,312 | LR |
+| **Hạng trung bình** | 1,86 | 3,43 | **1,43** | 3,29 | |
+
+### Precision
+
+| Bộ dữ liệu | LR | KNN | RF | NB | Tốt nhất |
+|---|---|---|---|---|---|
+| GMSC | 0,306 ± 0,014 | 0,347 ± 0,012 | **0,381 ± 0,016** | 0,191 ± 0,012 | RF |
+| Taiwan | **0,548 ± 0,043** | 0,407 ± 0,011 | 0,514 ± 0,020 | 0,484 ± 0,011 | LR |
+| Home Credit | **0,223 ± 0,014** | 0,116 ± 0,002 | 0,200 ± 0,014 | 0,086 ± 0,002 | LR |
+| HMEQ | 0,538 ± 0,023 | **0,786 ± 0,129** | 0,780 ± 0,027 | 0,440 ± 0,028 | KNN |
+| South German | **0,551 ± 0,041** | 0,438 ± 0,073 | 0,540 ± 0,035 | 0,492 ± 0,055 | LR |
+| FICO HELOC | **0,694 ± 0,021** | 0,643 ± 0,010 | 0,693 ± 0,026 | 0,671 ± 0,020 | LR |
+| Lending Club | **0,239** | 0,187 | 0,238 | 0,192 | LR |
+| **Hạng trung bình** | **1,57** | 3,14 | 1,86 | 3,43 | |
+
+### Recall
+
+| Bộ dữ liệu | LR | KNN | RF | NB | Tốt nhất |
+|---|---|---|---|---|---|
+| GMSC | 0,319 ± 0,013 | 0,274 ± 0,003 | **0,463 ± 0,025** | 0,344 ± 0,052 | RF |
+| Taiwan | 0,477 ± 0,030 | 0,540 ± 0,023 | 0,541 ± 0,036 | **0,542 ± 0,013** | NB |
+| Home Credit | 0,426 ± 0,043 | 0,462 ± 0,003 | 0,412 ± 0,035 | **0,906 ± 0,015** | NB |
+| HMEQ | 0,543 ± 0,045 | 0,726 ± 0,130 | **0,849 ± 0,036** | 0,595 ± 0,023 | RF |
+| South German | 0,588 ± 0,103 | 0,661 ± 0,129 | 0,622 ± 0,113 | **0,666 ± 0,066** | NB |
+| FICO HELOC | 0,839 ± 0,016 | **0,849 ± 0,010** | 0,835 ± 0,027 | 0,838 ± 0,029 | KNN |
+| Lending Club | 0,662 | 0,569 | 0,568 | **0,842** | NB |
+| **Hạng trung bình** | 3,14 | 2,43 | 2,71 | **1,71** | |
+
+### Ngưỡng quyết định
+
+| Bộ dữ liệu | LR | KNN | RF | NB | Tỷ lệ xấu |
+|---|---|---|---|---|---|
+| GMSC | 0,125 | 0,400 | 0,260 | 0,016 | 0,067 |
+| Taiwan | 0,296 | 0,400 | 0,325 | **1,000** | 0,221 |
+| Home Credit | 0,140 | 0,200 | 0,152 | **1,000** | 0,081 |
+| HMEQ | 0,283 | 0,320 | 0,314 | 0,061 | 0,199 |
+| South German | 0,407 | 0,360 | 0,386 | 0,704 | 0,300 |
+| FICO HELOC | 0,396 | 0,400 | 0,432 | 0,002 | 0,520 |
+| Lending Club | 0,139 | 0,200 | 0,180 | 0,012 | 0,149 |
+
+(Trung bình qua các fold; KNN với k = 5 chỉ có 6 mức xác suất nên ngưỡng rơi vào 0,2 / 0,4.)
+
+### Nhận xét
+
+- **F1 cho cùng kết luận với AUC**: RF tốt nhất (hạng 1,43), mạnh nhất ở GMSC (+0,105 so với LR) và HMEQ (+0,274); LR tốt nhất ở Home Credit, HELOC, Lending Club.
+- **LR có precision tốt nhất** (hạng 1,57, nhất ở 5/7 bộ): khi LR gắn nhãn xấu, khả năng đúng cao nhất. Đây là ưu thế quan trọng trong tín dụng, vì mỗi dự báo "xấu" sai là một khách hàng tốt bị từ chối.
+- **Recall "tốt nhất" của NB là ảo** (hạng 1,71): NB đạt recall cao vì gắn nhãn xấu cho phần lớn người vay, không phải vì phân biệt tốt. Trên Lending Club, ngưỡng chỉ 0,012, recall 0,84 nhưng precision 0,19 — gần bằng tỷ lệ xấu 0,15. Trên Home Credit, recall 0,91 nhưng precision chỉ 0,086 — gần như bằng tỷ lệ xấu 0,081, tức không tốt hơn gắn nhãn ngẫu nhiên. Hạng recall vì vậy không nên đọc riêng lẻ mà phải đi cùng precision; F1 và đường precision–recall cho bức tranh đúng hơn.
+- **NB cho thấy rõ hiện tượng bão hòa xác suất**: trên Home Credit, khoảng 87% dự đoán test bằng **đúng 1** và khoảng 5% gần bằng 0, nên ngưỡng tối ưu trên validation bằng đúng 1,000 và mọi dự đoán bằng 1 đều bị gắn nhãn xấu (khoảng 52 nghìn trên 61,5 nghìn dòng test mỗi fold). Đường precision–recall của NB trên Home Credit vì vậy gần như một đoạn thẳng. Taiwan có hiện tượng tương tự (ngưỡng ≈ 1,000).
+- **Mọi mô hình đều khó trên các bộ mất cân bằng nặng**: F1 tốt nhất chỉ 0,29 (Home Credit), 0,35 (Lending Club), 0,42 (GMSC). Precision ở các bộ này chỉ 0,2–0,4: cứ 3–5 người bị gắn nhãn xấu thì chỉ khoảng 1 người thực sự xấu.
+
+![Đường precision–recall trên test (chấm tròn: điểm vận hành tại ngưỡng F1 từ validation; nét chấm: mức cơ sở bằng tỷ lệ xấu)](../../reports/models/comparison/figures/pr_curves.png)
+
+Đường precision–recall xác nhận thứ tự theo AUC: đường của RF nằm trên các mô hình khác ở GMSC, HMEQ và Taiwan; đường của LR nằm trên ở Home Credit và Lending Club. Ở HMEQ, RF duy trì precision gần 1 tới recall khoảng 0,5.
+
+## 6.9. Learning curves
+
+![Learning curves: AUC validation (nét liền, vùng mờ = ± độ lệch chuẩn qua fold) và AUC train (nét đứt) theo số dòng train (thang log)](../../reports/models/learning_curves/figures/learning_curves.png)
+
+### AUC validation theo tỷ lệ dữ liệu train
+
+| Bộ dữ liệu | Mô hình | 5% | 20% | 100% | Tăng 20% → 100% |
+|---|---|---|---|---|---|
+| GMSC | LR | 0,708 | 0,694 | 0,695 | +0,001 |
+| | RF | 0,827 | 0,836 | 0,840 | +0,005 |
+| | KNN | 0,627 | 0,658 | 0,685 | +0,028 |
+| Taiwan | LR | 0,711 | 0,720 | 0,723 | +0,004 |
+| | RF | 0,750 | 0,762 | 0,770 | +0,008 |
+| Home Credit | LR | 0,723 | 0,741 | 0,748 | +0,007 |
+| | RF | 0,668 | 0,687 | 0,704 | +0,018 |
+| | KNN | 0,561 | 0,571 | 0,581 | +0,010 |
+| HMEQ | LR | 0,774 | 0,794 | 0,805 | +0,011 |
+| | RF | 0,855 | 0,914 | 0,969 | **+0,055** |
+| | KNN | 0,702 | 0,754 | 0,896 | **+0,143** |
+| South German | LR | — | 0,735 | 0,823 | **+0,088** |
+| | RF | — | 0,713 | 0,797 | **+0,084** |
+| FICO HELOC | LR | 0,768 | 0,794 | 0,801 | +0,007 |
+| | RF | 0,776 | 0,787 | 0,795 | +0,008 |
+| Lending Club | LR | 0,651 | 0,674 | 0,683 | +0,009 |
+| | RF | 0,643 | 0,648 | 0,659 | +0,010 |
+| | KNN | 0,555 | 0,554 | 0,563 | +0,009 |
+
+(Bảng đầy đủ cho cả 4 mô hình và 7 mức tỷ lệ: `reports/models/learning_curves/tables.md`. South German không có mức 5% vì dưới 50 dòng.)
+
+### Khoảng cách AUC train − validation ở 100% dữ liệu train
+
+| Bộ dữ liệu | LR | RF | NB |
+|---|---|---|---|
+| GMSC | +0,005 | +0,160 | +0,003 |
+| Taiwan | +0,004 | +0,231 | +0,001 |
+| Home Credit | −0,000 | +0,296 | +0,001 |
+| HMEQ | +0,003 | +0,031 | −0,014 |
+| South German | +0,014 | +0,203 | +0,038 |
+| FICO HELOC | +0,005 | +0,205 | +0,000 |
+| Lending Club | +0,003 | +0,341 | +0,002 |
+
+### Nhận xét
+
+**1. Bộ dữ liệu nào còn thiếu dữ liệu?**
+
+- **South German** là bộ duy nhất mà mọi mô hình vẫn tăng mạnh tới 100% dữ liệu (LR +0,088 từ 20% lên 100%). Với 640 dòng train, hiệu năng bị giới hạn bởi **lượng dữ liệu**; độ dao động lớn giữa các fold (mục 6.5) cũng xuất phát từ đây.
+- **HMEQ** với RF và KNN vẫn tăng rõ (+0,055 và +0,143) và chưa nằm ngang: các mô hình dựa trên phân vùng/láng giềng hưởng lợi khi mật độ dữ liệu tăng. Đường của KNN tăng rất dốc ở phần cuối, phù hợp với giả thuyết ở mục 6.7 rằng HMEQ có các hồ sơ gần giống nhau (càng nhiều dòng, láng giềng gần nhất càng có khả năng là một hồ sơ gần như trùng) — giả thuyết này vẫn cần kiểm tra trực tiếp.
+- Các bộ còn lại gần như **đã bão hòa** với LR: tăng dưới 0,01 AUC từ 20% lên 100%. Thêm dữ liệu cùng loại không cải thiện đáng kể; muốn cải thiện cần mô hình hoặc đặc trưng tốt hơn.
+
+**2. LR bị giới hạn bởi dạng mô hình, không phải bởi dữ liệu.**
+
+- Đường validation của LR nằm ngang sớm, và AUC train ≈ AUC validation ở mọi bộ (khoảng cách ≤ 0,014): LR **không overfit**, giới hạn nằm ở **độ lệch (bias)** của mô hình tuyến tính.
+- Rõ nhất ở **GMSC**: LR nằm ngang ở ~0,69 ngay từ 2% dữ liệu, trong khi RF đạt 0,83 cũng chỉ với 2% (khoảng 1.900 dòng). Nguyên nhân là ngoại lai (mục 6.3), không phải thiếu dữ liệu — thêm dữ liệu không giúp được LR.
+
+**3. RF học thuộc tập train nhưng vẫn tổng quát tốt ở nhiều bộ.**
+
+- AUC train của RF luôn bằng 1,000 ở mọi mức dữ liệu (đường nét đứt nằm trên cùng): cây phát triển hết độ sâu học thuộc từng dòng train. Khoảng cách train − validation lên tới 0,16–0,34, ngoại trừ HMEQ (0,03).
+- Dù vậy, AUC validation của RF vẫn tăng đều theo dữ liệu, nên việc học thuộc không làm hỏng mô hình mà chủ yếu làm lãng phí dung lượng. Đây là dấu hiệu RF sẽ hưởng lợi khi tinh chỉnh các tham số hạn chế độ phức tạp (độ sâu tối đa, số dòng tối thiểu ở lá).
+
+**4. Mô hình tốt nhất phụ thuộc lượng dữ liệu.**
+
+- **HELOC**: RF tốt hơn LR khi có ít dữ liệu (2%: 0,765 so với 0,735), LR vượt lên từ khoảng 10% (≈ 630 dòng) và giữ ưu thế.
+- **Lending Club**: RF tốt hơn ở 2% (0,631 so với 0,617), LR vượt từ 5% trở đi và bỏ xa dần (100%: 0,683 so với 0,659).
+- **Home Credit**: LR tốt hơn RF ở mọi mức, nhưng RF tăng nhanh hơn (+0,018 so với +0,007 từ 20% lên 100%), nên khoảng cách thu hẹp dần khi có thêm dữ liệu.
+
+**5. KNN và NB.**
+
+- KNN trên Home Credit và Lending Club gần như **không tăng** theo dữ liệu (0,55–0,58): với 184–250 chiều, thêm điểm không làm khoảng cách Euclid có ý nghĩa hơn. Đây là giới hạn cấu trúc, không phải do thiếu dữ liệu.
+- NB có AUC train ≈ AUC validation (không overfit) và nằm ngang sớm: mô hình rất đơn giản, giới hạn bởi giả định độc lập. Trên Home Credit, đường của NB dao động và giảm ở 100% (0,546 → 0,532), phù hợp với hiện tượng bão hòa xác suất.
+
+### Tóm tắt mục 6.8–6.9
+
+| Câu hỏi | Trả lời |
+|---|---|
+| Xét theo F1, mô hình nào tốt nhất? | RF (hạng 1,43), cùng kết luận với AUC |
+| Mô hình nào gắn nhãn xấu chính xác nhất? | LR (precision hạng 1,57) |
+| Recall cao của NB có đáng tin? | Không — do ngưỡng rất thấp, precision gần mức cơ sở |
+| Bộ nào cần thêm dữ liệu? | South German (mọi mô hình), HMEQ (RF, KNN) |
+| Vì sao LR yếu trên GMSC? | Giới hạn của mô hình tuyến tính trước ngoại lai; thêm dữ liệu không giúp |
+| RF có overfit? | Có học thuộc train (AUC train = 1), nhưng AUC validation vẫn tăng theo dữ liệu; cần tinh chỉnh độ phức tạp |

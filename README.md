@@ -30,7 +30,8 @@ python -m src.data.make_splits                   # 5-fold train/val/test splits 
 python -m src.features.make_processed --family classic  # tier B.1 for LR/classic ML -> data/processed/classic (~30 s)
 python -m src.models.train_classic --run lr_default     # also knn_default, rf_default, nb_default -> reports/models/<run>
 python -m src.models.report_classic --run lr_default    # tables + figures per run
-python -m src.models.compare_models                     # ranks, Friedman / Wilcoxon-Holm -> reports/models/comparison
+python -m src.models.compare_models                     # AUC/precision/recall/F1, ranks, tests -> reports/models/comparison
+python -m src.models.learning_curves                    # learning curves (~4 min) -> reports/models/learning_curves
 ```
 
 Or run every stage in order: `python run_pipeline.py` (see `python run_pipeline.py --help`).

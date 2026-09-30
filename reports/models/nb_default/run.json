@@ -75,34 +75,34 @@
     "home_credit": {
       "fits": {
         "fold1": {
-          "fit_seconds": 0.16,
+          "fit_seconds": 0.1,
           "n_iter": null,
           "converged": true,
-          "predict_seconds": 0.36
+          "predict_seconds": 0.26
         },
         "fold2": {
-          "fit_seconds": 0.15,
+          "fit_seconds": 0.12,
           "n_iter": null,
           "converged": true,
           "predict_seconds": 0.33
         },
         "fold3": {
-          "fit_seconds": 0.13,
+          "fit_seconds": 0.12,
           "n_iter": null,
           "converged": true,
-          "predict_seconds": 0.33
+          "predict_seconds": 0.32
         },
         "fold4": {
-          "fit_seconds": 0.11,
+          "fit_seconds": 0.12,
           "n_iter": null,
           "converged": true,
-          "predict_seconds": 0.35
+          "predict_seconds": 0.31
         },
         "fold5": {
-          "fit_seconds": 0.11,
+          "fit_seconds": 0.12,
           "n_iter": null,
           "converged": true,
-          "predict_seconds": 0.34
+          "predict_seconds": 0.37
         }
       },
       "bootstrap_test_auc": null
@@ -218,13 +218,13 @@
           "fit_seconds": 0.04,
           "n_iter": null,
           "converged": true,
-          "predict_seconds": 0.51
+          "predict_seconds": 0.49
         },
         "refit": {
-          "fit_seconds": 0.11,
+          "fit_seconds": 0.12,
           "n_iter": null,
           "converged": true,
-          "predict_seconds": 0.28
+          "predict_seconds": 0.29
         }
       },
       "bootstrap_test_auc": {

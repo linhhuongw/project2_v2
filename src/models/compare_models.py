@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from scipy import stats  # noqa: E402
-from sklearn.metrics import roc_auc_score  # noqa: E402
+from sklearn.metrics import precision_recall_curve, roc_auc_score  # noqa: E402
 
 from src.data.datasets import ROOT  # noqa: E402
 from src.models.report_classic import LABELS  # noqa: E402
@@ -33,7 +33,8 @@ REPORTS = ROOT / "reports" / "models"
 RUNS = ["lr_default", "knn_default", "rf_default", "nb_default"]
 NAMES = {"lr_default": "LR", "knn_default": "KNN", "rf_default": "RF", "nb_default": "NB"}
 HIGHER_IS_BETTER = {"auc": True, "gini": True, "ks": True, "ap": True, "f1": True,
-                    "brier": False, "logloss": False}
+                    "precision": True, "recall": True, "brier": False, "logloss": False}
+THRESHOLD_METRICS = {"f1": "F1", "precision": "Precision", "recall": "Recall"}
 SEED = 42
 
 
@@ -125,6 +126,8 @@ def figures(out, summ, rank_auc):
     fig.savefig(fig_dir / "auc_by_model.png", dpi=130)
     plt.close(fig)
 
+    pr_curves(fig_dir, summ, order, models, colors)
+
     mr = rank_auc.mean().sort_values()
     fig, ax = plt.subplots(figsize=(6, 2.4))
     ax.scatter(mr.values, [0] * len(mr), s=60, color=[colors.get(m) for m in mr.index], zorder=3)
@@ -136,6 +139,61 @@ def figures(out, summ, rank_auc):
     ax.grid(axis="x", alpha=0.4)
     fig.tight_layout()
     fig.savefig(fig_dir / "mean_rank.png", dpi=130)
+    plt.close(fig)
+
+
+def pr_curves(fig_dir, summ, order, models, colors):
+    """Precision–recall curves on test (5 folds pooled; Lending Club: refit), with the operating
+    point at the validation-F1 threshold (mean precision / recall over folds) marked."""
+    runs = {NAMES[r]: r for r in RUNS if NAMES[r] in models}
+    ncols = 4
+    nrows = int(np.ceil(len(order) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.2 * ncols, 3.4 * nrows), squeeze=False)
+    for ax, name in zip(axes.flat, order):
+        base = summ[summ.dataset == name].bad_rate.iloc[0]
+        for m in models:
+            pr = pd.read_parquet(REPORTS / runs[m] / "predictions" / f"{name}.parquet").query("part == 'test'")
+            pr = pr[pr.fit == "train+val"] if (pr.fit == "train+val").any() else pr
+            prec, rec, _ = precision_recall_curve(pr.target, pr.proba)
+            ax.plot(rec, prec, lw=1.2, color=colors.get(m), label=m)
+            s = summ[(summ.dataset == name) & (summ.model == m)].iloc[0]
+            ax.plot(s.recall, s.precision, "o", ms=6, color=colors.get(m), markeredgecolor="k")
+        ax.axhline(base, color="grey", ls=":", lw=1)
+        ax.set_title(LABELS[name], fontsize=10)
+        ax.set_xlabel("Recall", fontsize=8)
+        ax.set_ylabel("Precision", fontsize=8)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1.02)
+        ax.tick_params(labelsize=7)
+        ax.grid(alpha=0.3)
+    for ax in axes.flat[len(order):]:
+        ax.axis("off")
+    h, lab = axes.flat[0].get_legend_handles_labels()
+    h += [plt.Line2D([0], [0], marker="o", color="w", markerfacecolor="grey", markeredgecolor="k", ms=7),
+          plt.Line2D([0], [0], color="grey", ls=":")]
+    lab += ["điểm vận hành (ngưỡng F1 từ validation)", "mức cơ sở = tỷ lệ xấu"]
+    axes.flat[-1].legend(h, lab, loc="center", fontsize=9)
+    fig.suptitle("Đường precision–recall trên test")
+    fig.tight_layout()
+    fig.savefig(fig_dir / "pr_curves.png", dpi=130)
+    plt.close(fig)
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
+    w = 0.8 / len(models)
+    x = np.arange(len(order))
+    for ax, (met, title) in zip(axes, THRESHOLD_METRICS.items()):
+        for i, m in enumerate(models):
+            s = summ[summ.model == m].set_index("dataset").loc[order]
+            ax.bar(x + (i - (len(models) - 1) / 2) * w, s[met], w, yerr=s[f"{met}_std"].fillna(0),
+                   capsize=2, color=colors.get(m), label=m)
+        ax.set_xticks(x, [LABELS[d] for d in order], rotation=30, ha="right", fontsize=8)
+        ax.set_title(title)
+        ax.set_ylim(0, 1)
+        ax.grid(axis="y", alpha=0.3)
+    axes[0].legend(ncol=len(models), fontsize=8)
+    fig.suptitle("Độ đo theo ngưỡng trên test (ngưỡng tối đa F1 trên validation)")
+    fig.tight_layout()
+    fig.savefig(fig_dir / "precision_recall_f1.png", dpi=130)
     plt.close(fig)
 
 
@@ -194,8 +252,26 @@ def main(argv=None):
           "| Mô hình | Chênh AUC | KTC 95% | p |", "|---|---|---|---|"]
     for m, v in lc.items():
         L.append(f"| {m} − LR | {v['diff']:+.4f} | {v['ci95'][0]:+.4f} đến {v['ci95'][1]:+.4f} | {v['p_two_sided']:.3f} |")
-    L += ["", "## Bảng 7 — Các độ đo khác trên test", ""]
-    for met in ["ks", "brier", "ap", "f1"]:
+    L += ["", "## Bảng 7 — F1, precision, recall trên test (ngưỡng tối đa F1 trên validation)", ""]
+    for met, title in THRESHOLD_METRICS.items():
+        t = summ.pivot(index="dataset", columns="model", values=met).loc[order, models]
+        sd = summ.pivot(index="dataset", columns="model", values=f"{met}_std").loc[order, models]
+        r = ranks(summ, met).loc[order, models]
+        L += [f"**{title}**", "", "| Bộ dữ liệu | " + " | ".join(models) + " | Tốt nhất |", "|---|" + "---|" * (len(models) + 1)]
+        for d in order:
+            best = t.loc[d].idxmax()
+            cells = [("**" + fmt(t.loc[d, m], sd.loc[d, m]) + "**") if m == best else fmt(t.loc[d, m], sd.loc[d, m])
+                     for m in models]
+            L.append(f"| {LABELS[d]} | " + " | ".join(cells) + f" | {best} |")
+        L += ["| **Hạng trung bình** | " + " | ".join(f"{r[m].mean():.2f}" for m in models) + " | |", ""]
+    thr = folds[(folds.part == "test")].groupby(["dataset", "model"]).threshold.mean().unstack().loc[order, models]
+    L += ["**Ngưỡng quyết định** (trung bình qua các fold; chọn trên validation để tối đa F1)", "",
+          "| Bộ dữ liệu | " + " | ".join(models) + " | Tỷ lệ xấu |", "|---|" + "---|" * (len(models) + 1)]
+    for d in order:
+        L.append(f"| {LABELS[d]} | " + " | ".join(f"{thr.loc[d, m]:.3f}" for m in models)
+                 + f" | {summ[summ.dataset == d].bad_rate.iloc[0]:.3f} |")
+    L += ["", "## Bảng 8 — Các độ đo khác trên test", ""]
+    for met in ["ks", "brier", "ap"]:
         t = summ.pivot(index="dataset", columns="model", values=met).loc[order, models]
         L += [f"**{met.upper()}**", "", "| Bộ dữ liệu | " + " | ".join(models) + " |", "|---|" + "---|" * len(models)]
         for d in order:

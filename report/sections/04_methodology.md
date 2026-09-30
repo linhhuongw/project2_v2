@@ -139,4 +139,18 @@ Theo đặc tả, các mô hình được so sánh trên 7 bộ dữ liệu bằ
 3. **Wilcoxon signed-rank từng cặp** với hiệu chỉnh **Holm** cho nhiều phép so sánh.
 4. Bổ sung ở mức từng bộ dữ liệu: số fold mô hình thắng LR (6 bộ CV); với Lending Club, **bootstrap ghép cặp** (1.000 lần) của chênh lệch AUC trên cùng 282.787 dòng test.
 
+Ngoài AUC, các mô hình được so sánh trên **precision, recall và F1** tại ngưỡng tối đa F1 chọn trên validation (mục 4.6), cùng **đường precision–recall** trên test.
+
 Với chỉ 7 bộ dữ liệu, Wilcoxon có năng lực thống kê thấp: p nhỏ nhất có thể đạt được (khi một mô hình thắng ở cả 7 bộ) là 0,0156 trước hiệu chỉnh; sau hiệu chỉnh Holm cho 6 cặp, không cặp nào có thể xuống dưới 0,05 nếu thứ tự hai mô hình không nhất quán tuyệt đối.
+
+## 4.8. Learning curves
+
+Learning curve cho biết hiệu năng thay đổi thế nào khi tăng lượng dữ liệu huấn luyện, từ đó phân biệt mô hình bị giới hạn bởi **dữ liệu** (đường validation còn đi lên) hay bởi **chính mô hình** (đường validation đã nằm ngang), và mức overfit (khoảng cách giữa AUC train và AUC validation).
+
+| Mục | Cách làm |
+|---|---|
+| Tỷ lệ dữ liệu train | 2%, 5%, 10%, 20%, 40%, 70%, 100% phần train của fold; bỏ các mức dưới 50 dòng |
+| Lấy mẫu con | Phân tầng theo nhãn và **lồng nhau** (các dòng ở mức nhỏ luôn nằm trong mức lớn hơn), seed cố định |
+| Tiền xử lý | Tầng B.1 được **fit lại trên chính mẫu con** (cột theo kết quả B.0 của fold), để mẫu con nhỏ không được hưởng thống kê của các dòng mà mô hình không thấy |
+| Đánh giá | AUC trên mẫu con (đường train; không tính cho KNN) và AUC trên **validation** của fold (đường validation). Tập test **không** được dùng |
+| Fold | 5 fold cho các bộ CV; riêng Home Credit chỉ fold 1 (giới hạn chi phí của KNN); Lending Club: train 2013, validation 2014 |

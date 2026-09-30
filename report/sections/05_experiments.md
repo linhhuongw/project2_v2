@@ -42,6 +42,7 @@ Tổng thời gian fit và dự đoán của mỗi mô hình (giây, CPU 10 nhâ
 - LR hội tụ ở mọi lần fit (tối đa 89 vòng lặp).
 - KNN gần như không tốn thời gian fit nhưng rất chậm khi dự đoán: mỗi dòng validation/test phải tính khoảng cách tới toàn bộ dòng train. KNN chiếm khoảng 80% tổng thời gian chạy của cả bốn mô hình (78% trên Home Credit, 88% trên Lending Club).
 - RF dùng tối đa khoảng 3 GB bộ nhớ trên Home Credit.
+- Learning curves (716 lần fit: 4 mô hình × 7 tỷ lệ × các fold) chạy trong khoảng 4 phút; phần lớn thời gian là KNN (113 giây) và RF (70 giây).
 
 ## 5.4. Tái lập
 
@@ -59,6 +60,7 @@ python run_pipeline.py --only train report    # chỉ huấn luyện và tạo b
 | Tầng B.1 | `src/features/preprocess.py`, `src/features/make_processed.py` | `data/processed/classic/` |
 | Huấn luyện, đánh giá | `src/models/train_classic.py`, `src/models/metrics.py` | `reports/models/<mô hình>_default/` |
 | Bảng, hình từng mô hình | `src/models/report_classic.py` | `reports/models/<mô hình>_default/tables.md`, `figures/` |
-| So sánh mô hình | `src/models/compare_models.py` | `reports/models/comparison/` |
+| So sánh mô hình (AUC, precision, recall, F1, kiểm định) | `src/models/compare_models.py` | `reports/models/comparison/` |
+| Learning curves | `src/models/learning_curves.py` | `reports/models/learning_curves/` |
 
 Dự đoán của từng dòng validation và test được lưu trong `reports/models/<mô hình>_default/predictions/`, dùng cho kiểm định bootstrap ghép cặp và các so sánh sau này.

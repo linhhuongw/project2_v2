@@ -11,7 +11,9 @@ Stages (configs/preprocessing_v1.md):
   preprocess  tier B.1 for classic ML (median, standardise, one-hot; fit on train) -> data/processed/classic
   train       LR, KNN, RF, NB with default hyperparameters -> reports/models/<model>_default
   report      tables and figures per model run (report.md files are hand-written)
-  compare     model comparison: ranks, Friedman / Wilcoxon-Holm -> reports/models/comparison
+  compare     model comparison: AUC, precision, recall, F1, ranks, Friedman / Wilcoxon-Holm,
+              precision-recall curves -> reports/models/comparison
+  curves      learning curves (AUC vs training size, validation only) -> reports/models/learning_curves
 """
 
 import argparse
@@ -20,7 +22,7 @@ import time
 
 from src.data import make_interim, make_splits
 from src.features import make_processed
-from src.models import compare_models, report_classic, train_classic
+from src.models import compare_models, learning_curves, report_classic, train_classic
 
 RUNS = ["lr_default", "knn_default", "rf_default", "nb_default"]
 
@@ -31,6 +33,7 @@ STAGES = {
     "train": lambda: [train_classic.main(["--run", r]) for r in RUNS],
     "report": lambda: [report_classic.main(["--run", r]) for r in RUNS],
     "compare": lambda: compare_models.main([]),
+    "curves": lambda: learning_curves.main([]),
 }
 
 

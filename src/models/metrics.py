@@ -24,11 +24,12 @@ def f1_threshold(y_val, p_val) -> float:
 
 def score(y, p, threshold: float | None = None) -> dict:
     y = np.asarray(y).astype(int)
-    p = np.clip(np.asarray(p, dtype=float), 1e-15, 1 - 1e-15)
+    p = np.asarray(p, dtype=float)
     auc = roc_auc_score(y, p)
     out = {
         "auc": auc, "gini": 2 * auc - 1, "ks": ks_stat(y, p),
-        "brier": brier_score_loss(y, p), "logloss": log_loss(y, p),
+        # clip only for LogLoss; thresholds must see the raw scores (a threshold can be exactly 1.0)
+        "brier": brier_score_loss(y, p), "logloss": log_loss(y, np.clip(p, 1e-15, 1 - 1e-15)),
         "ap": average_precision_score(y, p),
         "bad_rate": float(y.mean()), "mean_pred": float(p.mean()),
     }
