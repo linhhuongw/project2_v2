@@ -4,8 +4,8 @@
 
 | Mục | Giá trị |
 |---|---|
-| Mô hình | LR, KNN, RF, NB — tham số mặc định của scikit-learn 1.7 (mục 4.5); `random_state = 42` cho LR và RF |
-| Tiền xử lý | Tầng A → chia dữ liệu → B.0 → B.1 nhánh classic (chương 4) |
+| Mô hình | Classic ML: LR, KNN, RF, NB (scikit-learn 1.7). GBDT: XGBoost 3.3, LightGBM 4.7, CatBoost 1.2. Tất cả tham số mặc định (mục 4.5); seed 42 |
+| Tiền xử lý | Tầng A → chia dữ liệu → B.0 → B.1: nhánh one-hot cho classic ML, nhánh mã số nguyên cho GBDT (chương 4) |
 | Số lần fit mỗi mô hình | 5 fold × 6 bộ = 30; Lending Club: 2 (train 2013, và fit lại trên 2013–2014) |
 | Seed | 42 cho chia dữ liệu, mô hình và bootstrap |
 | Phần cứng | Máy tính cá nhân, CPU |
@@ -26,21 +26,22 @@ Kích thước các fold dao động nhẹ (vài chục dòng) vì việc chia t
 
 ## 5.3. Thời gian chạy
 
-Tổng thời gian fit và dự đoán của mỗi mô hình (giây, CPU 10 nhân):
+Tổng thời gian fit và dự đoán của mỗi mô hình (giây, CPU 10 nhân; mỗi mô hình chạy riêng, không chạy song song với mô hình khác):
 
-| Bộ dữ liệu | LR | KNN | RF | NB |
-|---|---:|---:|---:|---:|
-| GMSC | 0,5 | 3,8 | 7,5 | 0,1 |
-| Taiwan | 0,3 | 0,7 | 2,2 | < 0,1 |
-| Home Credit | 9,3 | 185,2 | 40,6 | 2,4 |
-| HMEQ | < 0,1 | 0,1 | 0,6 | < 0,1 |
-| South German | < 0,1 | < 0,1 | 0,4 | < 0,1 |
-| FICO HELOC | 0,1 | 0,1 | 0,8 | < 0,1 |
-| Lending Club | 3,4 | 150,0 | 16,1 | 0,9 |
-| **Tổng** | **13,8** | **339,9** | **68,3** | **3,4** |
+| Bộ dữ liệu | LR | KNN | RF | NB | XGB | LGBM | CatBoost |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| GMSC | 0,5 | 3,8 | 7,5 | 0,1 | 0,9 | 2,7 | 19,4 |
+| Taiwan | 0,3 | 0,7 | 2,2 | < 0,1 | 0,7 | 2,2 | 10,1 |
+| Home Credit | 9,3 | 185,2 | 40,6 | 2,2 | 3,8 | 7,3 | 65,3 |
+| HMEQ | < 0,1 | 0,1 | 0,6 | < 0,1 | 0,6 | 2,1 | 3,6 |
+| South German | < 0,1 | < 0,1 | 0,4 | < 0,1 | 0,6 | 1,4 | 1,6 |
+| FICO HELOC | 0,1 | 0,1 | 0,8 | < 0,1 | 0,6 | 1,8 | 4,8 |
+| Lending Club | 3,4 | 150,0 | 16,1 | 0,9 | 1,1 | 2,3 | 19,6 |
+| **Tổng** | **13,6** | **339,9** | **68,2** | **3,2** | **8,3** | **19,8** | **124,4** |
 
 - LR hội tụ ở mọi lần fit (tối đa 89 vòng lặp).
-- KNN gần như không tốn thời gian fit nhưng rất chậm khi dự đoán: mỗi dòng validation/test phải tính khoảng cách tới toàn bộ dòng train. KNN chiếm khoảng 80% tổng thời gian chạy của cả bốn mô hình (78% trên Home Credit, 88% trên Lending Club).
+- KNN gần như không tốn thời gian fit nhưng rất chậm khi dự đoán: mỗi dòng validation/test phải tính khoảng cách tới toàn bộ dòng train. Trong 4 mô hình classic, KNN chiếm khoảng 80% tổng thời gian chạy.
+- XGBoost là mô hình cây nhanh nhất (8 giây cho cả 7 bộ, nhanh hơn RF 8 lần). CatBoost chậm nhất trong nhóm GBDT vì mặc định dùng 1.000 cây (gấp 10 lần XGBoost và LightGBM). Các kết quả GBDT tái lập chính xác khi chạy lại (chênh AUC bằng 0).
 - RF dùng tối đa khoảng 3 GB bộ nhớ trên Home Credit.
 - Learning curves (716 lần fit: 4 mô hình × 7 tỷ lệ × các fold) chạy trong khoảng 4 phút; phần lớn thời gian là KNN (113 giây) và RF (70 giây).
 
@@ -57,8 +58,8 @@ python run_pipeline.py --only train report    # chỉ huấn luyện và tạo b
 |---|---|---|
 | Chuyển đổi dữ liệu thô | `src/data/make_interim.py` | `data/interim/` |
 | Tầng A, chia dữ liệu, B.0 | `src/data/datasets.py`, `src/data/make_splits.py` | `data/splits/` |
-| Tầng B.1 | `src/features/preprocess.py`, `src/features/make_processed.py` | `data/processed/classic/` |
-| Huấn luyện, đánh giá | `src/models/train_classic.py`, `src/models/metrics.py` | `reports/models/<mô hình>_default/` |
+| Tầng B.1 | `src/features/preprocess.py`, `src/features/make_processed.py` | `data/processed/classic/`, `data/processed/gbdt/` |
+| Huấn luyện, đánh giá (cả 7 mô hình) | `src/models/train_classic.py`, `src/models/metrics.py` | `reports/models/<mô hình>_default/` |
 | Bảng, hình từng mô hình | `src/models/report_classic.py` | `reports/models/<mô hình>_default/tables.md`, `figures/` |
 | So sánh mô hình (AUC, precision, recall, F1, kiểm định) | `src/models/compare_models.py` | `reports/models/comparison/` |
 | Learning curves | `src/models/learning_curves.py` | `reports/models/learning_curves/` |

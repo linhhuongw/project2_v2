@@ -28,10 +28,13 @@ python -m src.data.make_interim                  # raw -> data/interim (CSV / Pa
 python scripts/build_eda_notebooks.py --execute  # build + run notebooks/eda_*.ipynb (~1 min)
 python -m src.data.make_splits                   # 5-fold train/val/test splits -> data/splits (~3 min)
 python -m src.features.make_processed --family classic  # tier B.1 for LR/classic ML -> data/processed/classic (~30 s)
-python -m src.models.train_classic --run lr_default     # also knn_default, rf_default, nb_default -> reports/models/<run>
+python -m src.features.make_processed --family gbdt     # tier B.1 for GBDT (integer codes) -> data/processed/gbdt
+python -m src.models.train_classic --run lr_default     # also knn/rf/nb/xgb/lgbm/cat _default -> reports/models/<run>
 python -m src.models.report_classic --run lr_default    # tables + figures per run
 python -m src.models.compare_models                     # AUC/precision/recall/F1, ranks, tests -> reports/models/comparison
 python -m src.models.learning_curves                    # learning curves (~4 min) -> reports/models/learning_curves
+python -m src.models.compare_models --hmeq hmeq_blind  # comparison with leakage-controlled HMEQ (also hmeq_complete)
+python -m src.models.validity_checks                    # leakage / overfitting checks -> reports/models/validity
 ```
 
 Or run every stage in order: `python run_pipeline.py` (see `python run_pipeline.py --help`).

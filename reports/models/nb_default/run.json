@@ -142,6 +142,76 @@
       },
       "bootstrap_test_auc": null
     },
+    "hmeq_complete": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold2": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold3": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold4": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold5": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        }
+      },
+      "bootstrap_test_auc": null
+    },
+    "hmeq_blind": {
+      "fits": {
+        "fold1": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold2": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold3": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold4": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        },
+        "fold5": {
+          "fit_seconds": 0.0,
+          "n_iter": null,
+          "converged": true,
+          "predict_seconds": 0.0
+        }
+      },
+      "bootstrap_test_auc": null
+    },
     "south_german_credit": {
       "fits": {
         "fold1": {

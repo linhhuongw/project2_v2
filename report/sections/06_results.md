@@ -1,6 +1,6 @@
 # 6. Kết quả
 
-Mục 6.1–6.6 phân tích mô hình cơ sở Logistic Regression; mục 6.7 so sánh bốn mô hình classic ML (LR, KNN, RF, NB) theo AUC; mục 6.8 so sánh theo precision, recall, F1; mục 6.9 trình bày learning curves. Tất cả mô hình dùng tham số mặc định. Số liệu gốc nằm trong `reports/models/lr_default/` (`summary.csv`, `fold_metrics.csv`, `run.json`).
+Mục 6.1–6.6 phân tích mô hình cơ sở Logistic Regression; mục 6.7 so sánh bốn mô hình classic ML (LR, KNN, RF, NB) theo AUC; mục 6.8 so sánh theo precision, recall, F1; mục 6.9 trình bày learning curves; mục 6.10 so sánh ba mô hình gradient boosting (XGBoost, LightGBM, CatBoost) với classic ML; mục 6.11 kiểm tra rò rỉ dữ liệu và overfit. Tất cả mô hình dùng tham số mặc định. Số liệu gốc nằm trong `reports/models/lr_default/` (`summary.csv`, `fold_metrics.csv`, `run.json`).
 
 ## 6.1. Kết quả chính
 
@@ -381,3 +381,222 @@ Các độ đo này được tính tại **ngưỡng tối đa F1 chọn trên v
 | Bộ nào cần thêm dữ liệu? | South German (mọi mô hình), HMEQ (RF, KNN) |
 | Vì sao LR yếu trên GMSC? | Giới hạn của mô hình tuyến tính trước ngoại lai; thêm dữ liệu không giúp |
 | RF có overfit? | Có học thuộc train (AUC train = 1), nhưng AUC validation vẫn tăng theo dữ liệu; cần tinh chỉnh độ phức tạp |
+
+## 6.10. Gradient boosting so với classic ML
+
+Ba mô hình GBDT (XGBoost, LightGBM, CatBoost) được huấn luyện trên **đúng các fold** của classic ML, với tham số mặc định của từng thư viện và nhánh tiền xử lý mã số nguyên (mục 4.4–4.5). Số liệu gốc: `reports/models/{xgb,lgbm,cat}_default/` và `reports/models/comparison/`.
+
+![AUC test của 7 mô hình trên 7 bộ dữ liệu](../../reports/models/comparison/figures/auc_by_model.png)
+
+### AUC trên test
+
+| Bộ dữ liệu | LR | KNN | RF | NB | XGB | LGBM | CatBoost | Tốt nhất |
+|---|---|---|---|---|---|---|---|---|
+| GMSC | 0,6981 | 0,6859 | 0,8399 | 0,7042 | 0,8530 | 0,8631 | **0,8637** | CatBoost |
+| Taiwan | 0,7237 | 0,6985 | 0,7633 | 0,7323 | 0,7606 | 0,7780 | **0,7794** | CatBoost |
+| Home Credit | 0,7461 | 0,5819 | 0,7084 | 0,5310 | 0,7430 | 0,7537 | **0,7560** | CatBoost |
+| HMEQ | 0,8030 | 0,8993 | **0,9703** | 0,7704 | 0,9615 | 0,9573 | 0,9602 | RF |
+| South German | 0,7663 | 0,7084 | 0,7710 | 0,7156 | 0,7674 | 0,7639 | **0,7978** | CatBoost |
+| FICO HELOC | **0,8019** | 0,7427 | 0,7946 | 0,7587 | 0,7718 | 0,7893 | 0,8016 | LR |
+| Lending Club | 0,7018 | 0,5782 | 0,6777 | 0,6749 | 0,6921 | **0,7037** | 0,7024 | LGBM |
+| **Hạng trung bình** | 4,14 | 6,57 | 3,29 | 6,00 | 3,57 | 2,86 | **1,57** | |
+
+(Độ lệch chuẩn qua 5 fold: `reports/models/comparison/tables.md`, bảng 1.)
+
+### Hạng trung bình theo từng độ đo (1 = tốt nhất, 7 mô hình)
+
+| Độ đo | LR | KNN | RF | NB | XGB | LGBM | CatBoost |
+|---|---|---|---|---|---|---|---|
+| AUC / Gini | 4,14 | 6,57 | 3,29 | 6,00 | 3,57 | 2,86 | **1,57** |
+| KS | 4,29 | 6,29 | 3,57 | 6,14 | 3,71 | 2,43 | **1,57** |
+| AP | 4,14 | 6,29 | 3,71 | 6,57 | 3,43 | 2,29 | **1,57** |
+| F1 | 4,14 | 6,43 | 3,43 | 6,14 | 3,71 | 2,29 | **1,86** |
+| Precision | 3,71 | 6,00 | 4,00 | 6,43 | 3,71 | 2,29 | **1,86** |
+| Recall | 5,29 | 4,14 | 4,14 | **3,00** | 4,14 | 4,14 | 3,14 |
+| Brier | 3,57 | 5,86 | 3,57 | 7,00 | 3,86 | 2,57 | **1,57** |
+| LogLoss | 3,43 | 6,29 | 3,57 | 6,71 | 4,14 | 2,43 | **1,43** |
+
+CatBoost đứng đầu ở mọi độ đo trừ recall (recall cao của NB là ảo, mục 6.8); LightGBM đứng thứ hai ở mọi độ đo trừ recall.
+
+### Kiểm định thống kê
+
+| Kiểm định | Kết quả |
+|---|---|
+| Friedman (N = 7 bộ, k = 7 mô hình) | χ²_F = 27,80; p = 0,0001 |
+| Iman–Davenport | F = 11,74; **p < 0,0001** |
+
+So sánh từng mô hình với mô hình hạng tốt nhất (CatBoost), kiểm định z trên hạng, hiệu chỉnh Holm:
+
+| Mô hình | Chênh hạng so với CatBoost | z | p | p (Holm) | Khác biệt có ý nghĩa |
+|---|---|---|---|---|---|
+| KNN | +5,00 | 4,33 | < 0,0001 | 0,0001 | **có** |
+| NB | +4,43 | 3,84 | 0,0001 | 0,0006 | **có** |
+| LR | +2,57 | 2,23 | 0,0260 | 0,1038 | không |
+| XGB | +2,00 | 1,73 | 0,0833 | 0,2498 | không |
+| RF | +1,71 | 1,48 | 0,1376 | 0,2753 | không |
+| LGBM | +1,29 | 1,11 | 0,2655 | 0,2753 | không |
+
+![Biểu đồ critical difference (Nemenyi, α = 0,05)](../../reports/models/comparison/figures/cd_diagram.png)
+
+Với Nemenyi, CD = 3,41: CatBoost tốt hơn có ý nghĩa so với KNN và NB; LightGBM tốt hơn KNN. LR, RF, XGBoost, LightGBM và CatBoost **chưa phân biệt được về mặt thống kê** với 7 bộ dữ liệu. Wilcoxon từng cặp (21 cặp, hiệu chỉnh Holm) không cho cặp nào có ý nghĩa, đúng như dự báo ở mục 4.7.
+
+### Ở mức từng bộ dữ liệu
+
+**Mô hình classic tốt nhất so với mô hình GBDT tốt nhất (AUC test):**
+
+| Bộ dữ liệu | Classic tốt nhất | GBDT tốt nhất | Chênh lệch | GBDT tốt nhất − LR |
+|---|---|---|---|---|
+| GMSC | RF 0,8399 | CatBoost 0,8637 | **+0,024** | +0,166 |
+| Taiwan | RF 0,7633 | CatBoost 0,7794 | **+0,016** | +0,056 |
+| Home Credit | LR 0,7461 | CatBoost 0,7560 | **+0,010** | +0,010 |
+| HMEQ | RF 0,9703 | XGB 0,9615 | −0,009 | +0,159 |
+| South German | RF 0,7710 | CatBoost 0,7978 | **+0,027** | +0,031 |
+| FICO HELOC | LR 0,8019 | CatBoost 0,8016 | −0,000 | −0,000 |
+| Lending Club | LR 0,7018 | LGBM 0,7037 | +0,002 | +0,002 |
+
+**Số fold (trên 5) CatBoost thắng LR:** GMSC, Taiwan, Home Credit, HMEQ, South German đều 5/5; HELOC 3/5.
+
+**Lending Club** — chênh AUC so với LR trên cùng 282.787 dòng test (bootstrap ghép cặp, 1.000 lần):
+
+| Mô hình | Chênh AUC | KTC 95% | p |
+|---|---|---|---|
+| XGB − LR | −0,0097 | −0,0113 đến −0,0082 | < 0,001 |
+| LGBM − LR | **+0,0019** | +0,0008 đến +0,0029 | 0,004 |
+| CatBoost − LR | +0,0006 | −0,0009 đến +0,0019 | 0,48 |
+
+LightGBM là mô hình duy nhất vượt LR trên Lending Club có ý nghĩa thống kê, nhưng mức chênh chỉ 0,002 AUC; CatBoost ngang LR.
+
+### F1, precision, recall
+
+| Bộ dữ liệu | F1 tốt nhất (classic) | F1 tốt nhất (GBDT) |
+|---|---|---|
+| GMSC | RF 0,417 | **LGBM 0,438** |
+| Taiwan | RF 0,526 | **CatBoost 0,540** |
+| Home Credit | LR 0,291 | **CatBoost 0,302** |
+| HMEQ | **RF 0,813** | XGB 0,806 |
+| South German | RF 0,571 | **CatBoost 0,607** |
+| FICO HELOC | **LR 0,759** | CatBoost 0,756 |
+| Lending Club | LR 0,352 | **LGBM 0,353** |
+
+- Về F1, GBDT tốt nhất thắng classic tốt nhất ở 5/7 bộ; mức tăng lớn nhất ở South German (+0,035) và GMSC (+0,021).
+- **Ưu thế precision của LR biến mất** khi có GBDT: LR từ hạng 1,57 (trong 4 mô hình classic) xuống 3,71 (trong 7 mô hình); LightGBM và CatBoost có precision cao nhất (hạng 2,29 và 1,86). Riêng Taiwan, LR vẫn có precision cao nhất (0,548).
+
+### Overfit và calibration
+
+Khoảng cách AUC train − AUC test:
+
+| Bộ dữ liệu | RF | XGB | LGBM | CatBoost | LR |
+|---|---|---|---|---|---|
+| GMSC | +0,160 | +0,070 | +0,036 | **+0,035** | +0,002 |
+| Taiwan | +0,237 | +0,195 | +0,115 | **+0,114** | +0,003 |
+| Home Credit | +0,292 | +0,126 | **+0,054** | +0,084 | +0,003 |
+| HMEQ | +0,030 | +0,038 | +0,043 | **+0,034** | +0,005 |
+| South German | +0,229 | +0,233 | +0,236 | **+0,200** | +0,070 |
+| FICO HELOC | +0,205 | +0,223 | +0,160 | **+0,120** | +0,004 |
+| Lending Club | +0,322 | +0,189 | **+0,078** | +0,125 | −0,016 |
+
+(Với Lending Club, AUC train lấy từ mô hình chỉ fit trên 2013; AUC test từ mô hình fit lại trên 2013–2014.)
+
+- Cả ba GBDT overfit **ít hơn RF** ở hầu hết các bộ: RF mặc định để cây phát triển hết độ sâu (AUC train = 1), còn GBDT dùng cây nông (độ sâu 6 hoặc 31 lá). Trong nhóm GBDT, XGBoost overfit nhiều nhất ở 5/7 bộ (learning rate mặc định 0,3 cao hơn hẳn 0,1 của LightGBM và mức tự chọn của CatBoost).
+- **Calibration**: trên 4 bộ GMSC, Taiwan, Home Credit, HELOC, xác suất dự đoán trung bình của ba GBDT lệch tỷ lệ xấu thực dưới 0,7 điểm %. Lệch lớn hơn ở các bộ nhỏ (HMEQ, South German: dự đoán thấp hơn thực tế 1,3–2,9 điểm %). Trên Lending Club, cả ba đều dự đoán thấp hơn thực tế 1,3–1,7 điểm %, giống LR (1,4 điểm %): trôi dạt theo thời gian ảnh hưởng mọi mô hình như nhau.
+- CatBoost có xác suất tốt nhất (hạng 1,57 về Brier, 1,43 về LogLoss), nhờ 1.000 cây với learning rate nhỏ và cơ chế ordered boosting.
+
+### Thời gian chạy
+
+XGBoost là mô hình cây nhanh nhất (8 giây cho cả 7 bộ), LightGBM 20 giây, CatBoost 124 giây (1.000 cây mặc định). Cả ba nhanh hơn KNN (340 giây); XGBoost và LightGBM nhanh hơn RF (68 giây). Chi tiết ở mục 5.3.
+
+### Điểm nổi bật
+
+1. **CatBoost là mô hình tốt nhất tổng thể** với tham số mặc định: hạng 1,57 về AUC, đứng đầu ở 5/7 bộ, và đứng đầu ở mọi độ đo trừ recall. LightGBM đứng thứ hai (hạng 2,86).
+2. **Bước nhảy lớn nhất là từ mô hình tuyến tính sang mô hình cây, không phải từ RF sang boosting.** So với LR, GBDT tốt nhất tăng tới +0,166 AUC (GMSC) và +0,159 (HMEQ); nhưng so với mô hình classic tốt nhất (thường là RF), mức tăng chỉ từ −0,009 đến +0,027.
+3. **Khác biệt giữa các mô hình cây và LR chưa được khẳng định thống kê với 7 bộ dữ liệu.** Chỉ KNN và NB kém CatBoost có ý nghĩa; LR, RF, XGBoost, LightGBM, CatBoost nằm trong cùng một khoảng CD.
+4. **LR vẫn ngang GBDT ở các bộ tín hiệu gần tuyến tính hoặc có trôi dạt theo thời gian**: HELOC (LR 0,8019 so với CatBoost 0,8016) và Lending Club (LightGBM chỉ hơn LR 0,002 AUC). Với các bộ này, LR đơn giản, dễ diễn giải và nhanh vẫn là lựa chọn hợp lý.
+5. **Lợi ích của GBDT rõ nhất ở các bộ có quan hệ phi tuyến hoặc ngoại lai** (GMSC, Taiwan, South German). Trên GMSC, boosting giải quyết được vấn đề ngoại lai mà LR gặp phải (mục 6.3), đạt 0,864 — cao hơn cả LR sau khi cắt ngoại lai (0,852).
+6. **RF vẫn tốt nhất trên HMEQ** (0,970), vượt cả ba GBDT; đây là bộ duy nhất mà GBDT không cải thiện so với classic tốt nhất.
+7. **CatBoost ổn định nhất trên dữ liệu nhỏ**: trên South German (640 dòng train), CatBoost đạt 0,798 — hơn mọi mô hình khác ít nhất 0,027 — với độ lệch chuẩn giữa các fold thấp nhất trong nhóm cây (0,034 so với 0,044–0,052 của XGBoost và LightGBM).
+8. **XGBoost mặc định kém hơn LightGBM và CatBoost** (hạng 3,57, sau cả RF): learning rate 0,3 khiến mô hình overfit nhiều hơn. XGBoost là mô hình hưởng lợi nhiều nhất khi tinh chỉnh.
+
+**Giới hạn:** tất cả là tham số mặc định, không dừng sớm; mã số nguyên của biến phân loại được dùng như biến số thay vì cơ chế xử lý biến phân loại riêng của CatBoost và LightGBM; chỉ có 7 bộ dữ liệu nên năng lực kiểm định thấp. Bước tiếp theo là tinh chỉnh tham số bằng Optuna (20 lần thử mỗi fold, theo đặc tả) và tạo đặc trưng cho nhánh GBDT.
+
+## 6.11. Kiểm tra rò rỉ dữ liệu và overfit
+
+Các kiểm tra được mô tả ở mục 4.10; số liệu gốc trong `reports/models/validity/`.
+
+### Rò rỉ dữ liệu
+
+| Bộ dữ liệu | KC láng giềng test → train | KC train → train | Đặc trưng đơn mạnh nhất (AUC) | AUC chỉ dùng mẫu thiếu | Nhận ra dòng thiếu sau B.1 |
+|---|---|---|---|---|---|
+| GMSC | 0,071 | 0,070 | `RevolvingUtilization…` (0,782) | 0,518 | 1,000 |
+| Taiwan | 0,844 | 0,836 | `PAY_0` (0,719) | — | — |
+| Home Credit | 6,347 | 6,423 | `EXT_SOURCE_3` (0,661) | 0,591 | 1,000 |
+| **HMEQ** | 0,331 | 0,330 | `DEBTINC` (0,854) | **0,836** | **0,995** |
+| HMEQ (che giá trị thiếu) | 0,391 | 0,400 | `DEBTINC` (0,854) | 0,836 (dữ liệu gốc) | 0,907 |
+| HMEQ (đủ dữ liệu) | 0,302 | 0,303 | `DEBTINC` (0,728) | — | — |
+| South German | 2,629 | 2,683 | `status` (0,676) | — | — |
+| FICO HELOC | 2,130 | 2,193 | `ExternalRiskEstimate` (0,763) | 0,624 | 0,966 |
+| Lending Club | 5,889 | 5,283 | `sub_grade` (0,677) | 0,542 | 0,999 |
+
+("—": bộ dữ liệu không có giá trị thiếu.)
+
+**Không có rò rỉ do pipeline hay do cách chia:**
+
+- Ở mọi bộ, khoảng cách từ dòng test tới dòng train gần nhất bằng khoảng cách giữa các dòng train với nhau: dòng test **không** phải bản sao gần đúng của dòng train. Lending Club có khoảng cách test lớn hơn một chút (5,89 so với 5,28), đúng với việc test thuộc một năm khác.
+- Không cột đơn lẻ nào gần như tiết lộ nhãn: AUC cao nhất là 0,854 (`DEBTINC` của HMEQ), các bộ còn lại 0,66–0,78.
+- Các kiểm soát theo thiết kế (tiền xử lý chỉ học trên train, chia theo nhóm dòng trùng, chia theo thời gian và bỏ cột sau giải ngân ở Lending Club, chọn ngưỡng trên validation) đều được giữ.
+
+**Rò rỉ trong dữ liệu: HMEQ.** Mô hình chỉ dùng mẫu thiếu đạt 0,836 — cao hơn LR dùng toàn bộ dữ liệu (0,803) — và sau tiền xử lý Baesens, dòng nào từng bị thiếu bị nhận ra gần như chắc chắn (0,995). Đây là kênh rò rỉ đã phân tích ở mục 3.6. Ở các bộ khác, dòng thiếu cũng nhận ra được sau B.1 (0,97–1,00), nhưng mẫu thiếu gần như không mang thông tin về nhãn (AUC 0,52–0,62), nên không gây rò rỉ. Với HELOC, mẫu thiếu (0,624) đến từ các mã −7/−8 có nghĩa định sẵn (ví dụ "chưa từng quá hạn"), là thông tin hợp lệ.
+
+**Đặc trưng mạnh nhưng hợp lệ:** `sub_grade`, `int_rate` của Lending Club là xếp hạng và lãi suất do chính Lending Club định giá lúc duyệt khoản vay — có sẵn tại thời điểm quyết định, nhưng khiến mô hình học lại một phần mô hình rủi ro của Lending Club. `PAY_0` của Taiwan là trạng thái thanh toán tháng gần nhất — hợp lệ nếu dự báo được đưa ra sau khi tháng đó khép lại.
+
+### Kết quả sau khi ngăn rò rỉ ở HMEQ
+
+![AUC của HMEQ trước và sau khi ngăn rò rỉ](../../reports/figures/eda/hmeq_leakage_control_auc.png)
+
+| Mô hình | HMEQ gốc | Che giá trị thiếu | Chỉ hồ sơ đủ dữ liệu | Che − gốc |
+|---|---|---|---|---|
+| LR | 0,8030 | 0,7868 | 0,7864 | −0,016 |
+| KNN | 0,8993 | 0,8598 | 0,7883 | −0,039 |
+| RF | **0,9703** | **0,9436** | **0,9481** | −0,027 |
+| NB | 0,7704 | 0,7716 | 0,8010 | +0,001 |
+| XGB | 0,9615 | 0,9214 | 0,9213 | −0,040 |
+| LGBM | 0,9573 | 0,9214 | 0,9177 | −0,036 |
+| CatBoost | 0,9602 | 0,9196 | 0,9203 | −0,041 |
+
+- **Rò rỉ làm AUC tuyệt đối của HMEQ cao hơn thực tế** khoảng 0,02 (LR) đến 0,04 (GBDT).
+- Bản che giá trị thiếu chưa xóa hết dấu vết (dòng thiếu vẫn nhận ra được với AUC 0,907, vì giá trị rút ngẫu nhiên không khớp với các cột còn lại), nhưng dấu vết đó gần như không còn thông tin về nhãn: AUC của bản che và bản chỉ hồ sơ đủ dữ liệu — sạch tuyệt đối — gần như trùng nhau ở LR và cả bốn mô hình cây (chênh ≤ 0,005).
+- **Lợi thế của mô hình cây trên HMEQ là thật**: sau khi ngăn rò rỉ, RF và GBDT vẫn hơn LR khoảng 0,13–0,16 AUC. Điều này khớp với phân tích ở mục 6.7: trên các hồ sơ đủ dữ liệu, RF đạt 0,972 so với 0,798 của LR.
+- **Kết luận so sánh không đổi** khi thay HMEQ gốc bằng bản đã ngăn rò rỉ:
+
+| Bộ dữ liệu dùng cho HMEQ | LR | KNN | RF | NB | XGB | LGBM | CatBoost | Iman–Davenport |
+|---|---|---|---|---|---|---|---|---|
+| Gốc | 4,14 | 6,57 | 3,29 | 6,00 | 3,57 | 2,86 | **1,57** | F = 11,74; p < 0,0001 |
+| Che giá trị thiếu | 4,14 | 6,57 | 3,29 | 6,00 | 3,71 | 2,57 | **1,71** | F = 11,67; p < 0,0001 |
+| Chỉ hồ sơ đủ dữ liệu | 4,29 | 6,71 | 3,29 | 5,71 | 3,57 | 2,86 | **1,57** | F = 11,29; p < 0,0001 |
+
+(Hạng trung bình theo AUC trên 7 bộ dữ liệu; bảng đầy đủ: `reports/models/comparison_hmeq_blind/`, `reports/models/comparison_hmeq_complete/`.)
+
+### Overfit
+
+**Khoảng cách AUC train − test:**
+
+| Bộ dữ liệu | LR | NB | RF | XGB | LGBM | CatBoost |
+|---|---|---|---|---|---|---|
+| GMSC | +0,002 | +0,000 | +0,160 | +0,070 | +0,036 | +0,035 |
+| Taiwan | +0,003 | +0,002 | +0,237 | +0,195 | +0,115 | +0,114 |
+| Home Credit | +0,003 | +0,003 | +0,292 | +0,126 | +0,054 | +0,084 |
+| HMEQ | +0,005 | +0,001 | +0,030 | +0,038 | +0,043 | +0,034 |
+| **South German** | **+0,070** | **+0,062** | +0,229 | +0,233 | +0,236 | +0,200 |
+| FICO HELOC | +0,004 | +0,002 | +0,205 | +0,223 | +0,160 | +0,120 |
+| Lending Club | −0,016 | −0,020 | +0,322 | +0,189 | +0,078 | +0,125 |
+
+(KNN không có AUC train; với Lending Club, AUC train lấy từ mô hình chỉ fit trên 2013.)
+
+**Khoảng cách AUC validation − test:** |chênh| ≤ 0,007 ở mọi mô hình trên 5 bộ GMSC, Taiwan, Home Credit, HMEQ, HELOC (trừ NB trên HMEQ: 0,015); **South German +0,024 đến +0,056** ở mọi mô hình; Lending Club −0,015 đến −0,031.
+
+**Khi nào và vì sao:**
+
+1. **RF học thuộc mọi bộ** (AUC train = 1,000): cây mặc định phát triển hết độ sâu. Không gây hại ở GMSC, Taiwan, HMEQ (RF vẫn thuộc nhóm tốt nhất trên test), nhưng **gây hại** ở Home Credit, HELOC, Lending Club — các bộ nhiều đặc trưng, tín hiệu yếu và gần tuyến tính — nơi RF thua LR trên test.
+2. **XGBoost là GBDT overfit nhiều nhất** (learning rate mặc định 0,3), giải thích vì sao XGBoost xếp sau cả RF.
+3. **South German là bộ dễ overfit nhất**: mọi mô hình overfit, kể cả LR (+0,07 với 71 đặc trưng cho 640 dòng train); validation cao hơn test một cách hệ thống (160 dòng validation quá ít), nên mọi lựa chọn dựa trên validation — ngưỡng, và sau này là tham số — sẽ lạc quan; learning curve vẫn đi lên, tức bộ này thiếu dữ liệu.
+4. **LR và NB không overfit** (khoảng cách ≤ 0,005) ngoài South German; giới hạn của chúng là độ đơn giản của mô hình.
+5. **Lending Club**: test cao hơn validation khoảng 0,02 là do mô hình cuối được fit lại trên 2013–2014 (thêm dữ liệu), không phải overfit; rủi ro thực của bộ này là trôi dạt theo thời gian (mọi mô hình dự đoán thấp hơn tỷ lệ xấu 2015 khoảng 1,3–1,7 điểm %).

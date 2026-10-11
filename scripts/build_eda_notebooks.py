@@ -615,24 +615,172 @@ print("Đã lưu reports/tables/eda_comparison.csv")
 ]
 
 
+HMEQ_MISSING = [
+    md("""
+# EDA 09 — HMEQ: giá trị thiếu và rò rỉ thông tin
+
+Notebook này phân tích riêng **mẫu giá trị thiếu** của HMEQ. Kiểm tra rò rỉ (`reports/models/validity/`) cho thấy
+một mô hình chỉ biết *cột nào bị thiếu* (không thấy giá trị nào) đạt AUC 0,836 — cao hơn Logistic Regression dùng
+toàn bộ dữ liệu (0,803). Câu hỏi: đây là thông tin hợp lệ về người vay, hay dấu vết của quy trình ghi nhận hồ sơ sau
+khi biết kết cục (rò rỉ)? Và cách ngăn rò rỉ ảnh hưởng thế nào đến kết quả.
+
+Theo mô tả gốc, dữ liệu gồm *"recent applicants granted credit"*: các khoản vay đã được cấp, nhãn `BAD` được ghi
+nhận sau đó (vỡ nợ hoặc quá hạn nghiêm trọng).
+"""),
+    code(SETUP + """
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from lightgbm import LGBMClassifier
+import seaborn as sns
+NAME = "hmeq_missing"
+df = pd.read_csv(INTERIM / "hmeq.csv")
+X = df.drop(columns="target")
+M = X.isna()
+print(df.shape, f"bad rate {df.target.mean():.2%}")
+"""),
+    md("## 1. Mức thiếu và tỷ lệ xấu theo từng cột"),
+    code("""
+t = pd.DataFrame({
+    "missing_pct": 100 * M.mean(),
+    "bad_if_missing_pct": [100 * df.target[M[c]].mean() if M[c].any() else np.nan for c in X],
+    "bad_if_present_pct": [100 * df.target[~M[c]].mean() for c in X],
+}).round(1).sort_values("missing_pct", ascending=False)
+display(t)
+fig, ax = plt.subplots(figsize=(9, 3.6))
+tt = t[t.missing_pct > 0]
+x = np.arange(len(tt))
+ax.bar(x - 0.2, tt.bad_if_missing_pct, 0.4, label="khi thiếu", color="#DD5144")
+ax.bar(x + 0.2, tt.bad_if_present_pct, 0.4, label="khi có giá trị", color="#4C72B0")
+ax.axhline(100 * df.target.mean(), color="k", ls="--", lw=1, label="tỷ lệ xấu chung")
+ax.set_xticks(x, tt.index, rotation=30)
+ax.set_ylabel("Tỷ lệ xấu (%)")
+ax.set_title("HMEQ: tỷ lệ xấu khi cột bị thiếu và khi có giá trị")
+ax.legend(fontsize=8)
+eda.savefig(fig, "hmeq_missing_bad_rate")
+plt.show()
+"""),
+    md("## 2. Tỷ lệ xấu theo số cột bị thiếu và theo mẫu thiếu"),
+    code("""
+n_miss = M.sum(axis=1)
+display(df.groupby(n_miss.clip(upper=6))["target"].agg(n="size", bad_rate="mean").round(3)
+        .rename_axis("số cột thiếu (≥6 gộp)").T)
+pattern = M.apply(lambda r: " + ".join(c for c, v in r.items() if v) or "(đủ dữ liệu)", axis=1)
+pat = df.groupby(pattern)["target"].agg(n="size", bad_rate="mean").sort_values("n", ascending=False)
+display(pat.head(15).round(3))
+big = pat[pat.n >= 30]
+print(f"Các mẫu thiếu có ≥ 30 dòng: {len(big)}; tỷ lệ xấu từ {big.bad_rate.min():.1%} đến {big.bad_rate.max():.1%}")
+"""),
+    md("""
+**Đọc kết quả.** Việc thiếu dữ liệu tách nhãn theo **cả hai chiều**:
+
+- thiếu `DEBTINC` (tỷ lệ nợ/thu nhập) → khoảng 61% xấu; thiếu cả `VALUE` và `DEBTINC` → 100% xấu;
+- thiếu các biến lịch sử tín dụng (`DEROG`, `DELINQ`, `NINQ`) hoặc `JOB` → gần như 0–5% xấu;
+- hồ sơ đầy đủ → khoảng 9% xấu.
+
+Một quy luật "sạch" như vậy (100% so với 0%) khó giải thích bằng hành vi của người vay tại thời điểm nộp đơn; nó
+phù hợp hơn với giả thuyết các trường được **điền hoặc để trống khác nhau tùy theo kết cục** (ví dụ hồ sơ khoản vay
+xấu được xử lý, cập nhật khác hồ sơ khoản vay tốt).
+"""),
+    md("## 3. Mẫu thiếu có cấu trúc: tương quan giữa các cờ thiếu"),
+    code("""
+mc = M.loc[:, M.any()].astype(int)
+fig, ax = plt.subplots(figsize=(6.5, 5))
+sns.heatmap(mc.corr(), cmap="RdBu_r", center=0, vmin=-1, vmax=1, annot=True, fmt=".2f", ax=ax,
+            annot_kws={"size": 7}, cbar_kws={"shrink": 0.7})
+ax.set_title("Tương quan giữa các cờ 'bị thiếu'")
+eda.savefig(fig, "hmeq_missing_corr")
+plt.show()
+"""),
+    md("## 4. Chỉ riêng mẫu thiếu dự đoán được nhãn đến đâu?"),
+    code("""
+cv = StratifiedKFold(5, shuffle=True, random_state=42)
+ind = mc.astype(int)
+auc_missing = cross_val_score(LGBMClassifier(n_estimators=100, verbose=-1), ind, df.target, cv=cv, scoring="roc_auc")
+print(f"AUC 5-fold khi CHỈ dùng cờ thiếu (không dùng giá trị nào): {auc_missing.mean():.3f} ± {auc_missing.std():.3f}")
+comp = df[~M.any(axis=1)]
+print(f"Hồ sơ đầy đủ: {len(comp):,} dòng ({len(comp)/len(df):.1%}), tỷ lệ xấu {comp.target.mean():.1%}; "
+      f"hồ sơ thiếu ít nhất một cột: {(M.any(axis=1)).sum():,} dòng, tỷ lệ xấu {df.target[M.any(axis=1)].mean():.1%}")
+"""),
+    md("""
+## 5. Ngăn rò rỉ: hai phiên bản HMEQ
+
+| Phiên bản | Cách làm | Ưu điểm | Nhược điểm |
+|---|---|---|---|
+| `hmeq` (gốc) | Tiền xử lý Baesens: median + nhóm `__missing__` | Đúng giao thức | Mô hình đọc được mẫu thiếu: nhóm `__missing__`, và cây nhận ra giá trị median được điền |
+| `hmeq_complete` | Tầng A chỉ giữ hồ sơ đầy đủ (3.364 dòng) | Không còn giá trị thiếu nào | Đổi tổng thể: tỷ lệ xấu còn 8,9%; bỏ 44% dữ liệu |
+| `hmeq_blind` | Giữ mọi dòng và đúng các fold; tầng B.1 điền mỗi giá trị thiếu bằng **một giá trị rút ngẫu nhiên** từ các giá trị quan sát được của cột đó trên train | Giữ tổng thể và đúng các fold; xóa nhóm `__missing__` và điểm median | Không xóa hết dấu vết: giá trị rút ngẫu nhiên phá vỡ quan hệ giữa các cột (ví dụ dư nợ và giá trị nhà), nên dòng từng thiếu vẫn nhận ra được một phần |
+"""),
+    code("""
+from src.models.compare_models import NAMES, RUNS
+rows = []
+for r in RUNS:
+    s = pd.read_csv(ROOT / "reports" / "models" / r / "summary.csv").set_index("dataset")
+    rows.append({"model": NAMES[r], **{v: s.loc[v, "auc"] for v in ["hmeq", "hmeq_blind", "hmeq_complete"]}})
+res = pd.DataFrame(rows).set_index("model")
+res["blind − gốc"] = res.hmeq_blind - res.hmeq
+res["complete − gốc"] = res.hmeq_complete - res.hmeq
+display(res.round(4))
+fig, ax = plt.subplots(figsize=(8, 3.6))
+x = np.arange(len(res)); w = 0.27
+for i, (c, lab, col) in enumerate([("hmeq", "gốc", "#999999"), ("hmeq_blind", "che giá trị thiếu", "#4C72B0"),
+                                    ("hmeq_complete", "chỉ hồ sơ đầy đủ", "#55A868")]):
+    ax.bar(x + (i - 1) * w, res[c], w, label=lab, color=col)
+ax.set_xticks(x, res.index); ax.set_ylim(0.6, 1.0); ax.set_ylabel("AUC test")
+ax.set_title("HMEQ: AUC trước và sau khi ngăn rò rỉ qua giá trị thiếu"); ax.legend(fontsize=8)
+eda.savefig(fig, "hmeq_leakage_control_auc")
+plt.show()
+"""),
+    code("""
+v = ROOT / "reports" / "models" / "validity" / "leakage.csv"
+if v.exists():
+    lk = pd.read_csv(v).set_index("dataset").loc[["hmeq", "hmeq_blind", "hmeq_complete"],
+                                                ["missingness_only_auc", "missing_rows_detectable_auc"]]
+    display(lk.round(3))
+    print("missing_rows_detectable_auc: một mô hình có nhận ra được 'dòng này từng bị thiếu' từ ma trận sau tiền xử lý không "
+          "(0,5 = không nhận ra).")
+"""),
+    md("""
+## 6. Kết luận
+
+- Mẫu giá trị thiếu của HMEQ dự đoán nhãn mạnh hơn cả Logistic Regression dùng toàn bộ dữ liệu, và tách nhãn theo
+  cả hai chiều (tới 100% xấu và 0% xấu). Đây nhiều khả năng là **rò rỉ do quy trình ghi nhận hồ sơ**, không phải thông
+  tin có sẵn khi xét duyệt.
+- Với tiền xử lý Baesens, mô hình nhận ra gần như chắc chắn dòng nào từng bị thiếu (AUC 0,995) qua nhóm `__missing__`
+  và giá trị median được điền. `hmeq_blind` giảm khả năng này xuống 0,907 — chưa xóa hết, vì giá trị rút ngẫu nhiên
+  không khớp với các cột còn lại. `hmeq_complete` loại bỏ hoàn toàn (không còn giá trị thiếu) nhưng đổi tổng thể.
+- Dấu vết còn lại của `hmeq_blind` gần như không mang thông tin về nhãn: AUC của `hmeq_blind` và `hmeq_complete`
+  (sạch tuyệt đối) gần như trùng nhau ở mọi mô hình cây và LR (chênh ≤ 0,005).
+- Sau khi ngăn rò rỉ, AUC của mọi mô hình giảm (mô hình cây giảm khoảng 0,03–0,04), nhưng **thứ tự các mô hình gần như
+  giữ nguyên** và mô hình cây vẫn hơn LR rất xa: lợi thế của mô hình cây trên HMEQ là thật, chỉ có mức AUC tuyệt đối
+  bị thổi phồng bởi rò rỉ.
+"""),
+]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--execute", action="store_true")
+    ap.add_argument("--only", nargs="*",
+                    help="build (and execute) only these notebook stems; others are left untouched")
     args = ap.parse_args()
     NB_DIR.mkdir(exist_ok=True)
+
+    def new_nb(cells):
+        nb = nbf.v4.new_notebook()
+        nb["cells"] = cells
+        nb["metadata"]["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
+        return nb
+
+    notebooks = {name: build(spec) for name, spec in SPECS.items() if spec is not None}
+    notebooks["eda_00_comparison"] = new_nb(COMPARISON)  # after eda_01..08: reads their summaries
+    notebooks["eda_09_hmeq_missingness"] = new_nb(HMEQ_MISSING)
+
     paths = []
-    for name, spec in SPECS.items():
-        if spec is None:
-            continue
+    for name, nb in notebooks.items():
+        if args.only and name not in args.only:
+            continue  # never overwrite (and wipe the outputs of) notebooks that were not asked for
         p = NB_DIR / f"{name}.ipynb"
-        nbf.write(build(spec), p)
+        nbf.write(nb, p)
         paths.append(p)
-    nb = nbf.v4.new_notebook()
-    nb["cells"] = COMPARISON
-    nb["metadata"]["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
-    p = NB_DIR / "eda_00_comparison.ipynb"
-    nbf.write(nb, p)
-    paths.append(p)  # comparison last: depends on the others' summaries
     print("\n".join(str(x.relative_to(ROOT)) for x in paths))
 
     if args.execute:

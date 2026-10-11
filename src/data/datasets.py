@@ -34,6 +34,7 @@ class DatasetSpec:
     non_features: list = field(default_factory=list)
     time_col: str | None = None
     periods: Callable[[], dict] | None = None               # time_holdout: {"train": (y0, y1), ...}
+    impute: str = "median"                                  # tier B.1: "median" (Baesens) or "random"
     notes: list = field(default_factory=list)
 
 
@@ -62,6 +63,13 @@ def load_home_credit():
 
 def load_hmeq():
     return _with_row_id(pd.read_csv(INTERIM / "hmeq.csv"))
+
+
+def load_hmeq_complete():
+    # leakage control: the missingness pattern of HMEQ predicts the label (up to 100% / 0% bad),
+    # so keep only complete applications (A2 row filter; deterministic, row-wise)
+    df = load_hmeq()
+    return df[df.drop(columns=["row_id", "target"]).notna().all(axis=1)]
 
 
 def load_south_german_credit():
@@ -156,6 +164,13 @@ SPECS = {
         notes=["application_train only", "SK_ID_CURR kept as non-feature key for later FE joins",
                "DAYS_EMPLOYED 365243 -> NaN"]),
     "hmeq": DatasetSpec("hmeq", load_hmeq, categorical=["REASON", "JOB"]),
+    "hmeq_complete": DatasetSpec(
+        "hmeq_complete", load_hmeq_complete, categorical=["REASON", "JOB"],
+        notes=["leakage control: complete applications only (3,364 of 5,960 rows)"]),
+    "hmeq_blind": DatasetSpec(
+        "hmeq_blind", load_hmeq, categorical=["REASON", "JOB"], impute="random",
+        notes=["leakage control: same rows and folds as hmeq; tier B.1 fills every missing value with a "
+               "random draw from the training values of that column (no median point mass, no __missing__ group)"]),
     "south_german_credit": DatasetSpec(
         "south_german_credit", load_south_german_credit,
         categorical=["status", "credit_history", "purpose", "savings", "employment_duration",

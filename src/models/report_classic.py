@@ -24,7 +24,8 @@ from src.data.datasets import ROOT  # noqa: E402
 REPORTS = ROOT / "reports" / "models"
 LABELS = {
     "give_me_some_credit": "GMSC", "taiwan_default_credit": "Taiwan", "home_credit": "Home Credit",
-    "hmeq": "HMEQ", "south_german_credit": "South German", "fico_heloc": "HELOC",
+    "hmeq": "HMEQ", "hmeq_complete": "HMEQ (đủ dữ liệu)", "hmeq_blind": "HMEQ (che giá trị thiếu)",
+    "south_german_credit": "South German", "fico_heloc": "HELOC",
     "lending_club_B": "Lending Club",
 }
 

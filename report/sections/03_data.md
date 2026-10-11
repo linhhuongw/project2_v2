@@ -124,3 +124,29 @@ Năm test được chọn là năm gần nhất có ít nhất 95% khoản vay �
 ![Tỷ lệ khoản vay đã kết thúc và tỷ lệ xấu theo năm phát hành (toàn bộ Lending Club, giai đoạn EDA)](../../reports/figures/eda/lending_club_vintage.png)
 
 Tỷ lệ xấu tăng dần theo năm: 12,33% (2013) → 13,73% (2014) → 14,88% (2015). Đây là trôi dạt thật theo thời gian và ảnh hưởng đến calibration trên test (chương 6).
+
+## 3.6. HMEQ — giá trị thiếu là dấu hiệu rò rỉ
+
+Kiểm tra rò rỉ (mục 6.11) cho thấy một điểm bất thường ở HMEQ: một mô hình **chỉ biết cột nào bị thiếu**, không thấy bất kỳ giá trị nào, đạt AUC 0,836 trên test — cao hơn Logistic Regression dùng toàn bộ dữ liệu (0,803). Phân tích chi tiết nằm trong `notebooks/eda_09_hmeq_missingness.ipynb`.
+
+![Tỷ lệ xấu khi từng cột bị thiếu và khi có giá trị](../../reports/figures/eda/hmeq_missing_bad_rate.png)
+
+**Mẫu thiếu tách nhãn theo cả hai chiều:**
+
+| Mẫu giá trị thiếu | Số dòng | Tỷ lệ xấu |
+|---|---:|---:|
+| Đủ dữ liệu | 3.364 | 8,9% |
+| Chỉ thiếu `DEBTINC` (tỷ lệ nợ/thu nhập) | 883 | 61,2% |
+| Thiếu `MORTDUE` và `DEBTINC` | 52 | 65,4% |
+| Thiếu `VALUE` (giá trị nhà) và `DEBTINC` | 47 | **100%** |
+| Chỉ thiếu `YOJ` (số năm làm việc) | 184 | 4,9% |
+| Chỉ thiếu `JOB` | 81 | 1,2% |
+| Thiếu `DEROG`, `DELINQ` và `NINQ` (lịch sử tín dụng) | 87 | **0%** |
+
+- Hồ sơ thiếu ít nhất một cột (2.596 dòng, 43,6%) có tỷ lệ xấu **34,2%**, gấp gần 4 lần hồ sơ đủ dữ liệu (8,9%).
+- Trong 17 mẫu thiếu có ít nhất 30 dòng, tỷ lệ xấu trải từ **0% đến 100%**.
+- Chỉ riêng các cờ "bị thiếu" (không dùng giá trị nào) đạt AUC 0,825 ± 0,011 trong 5-fold CV.
+
+**Vì sao đây nhiều khả năng là rò rỉ.** Theo mô tả gốc, dữ liệu gồm *các khoản vay đã được cấp*, nhãn `BAD` được ghi nhận sau đó. Một quy luật "sạch" như 100% xấu khi thiếu giá trị nhà và tỷ lệ nợ/thu nhập, và 0% xấu khi thiếu toàn bộ lịch sử tín dụng, khó giải thích bằng hành vi của người vay lúc nộp đơn. Nó phù hợp hơn với giả thuyết các trường được **điền hoặc để trống khác nhau tùy theo kết cục** của khoản vay (ví dụ hồ sơ khoản vay xấu được xử lý, cập nhật theo quy trình khác). Khi đó, mẫu thiếu chứa thông tin về nhãn mà ngân hàng không có tại thời điểm xét duyệt.
+
+**Tiền xử lý Baesens truyền tín hiệu này cho mô hình:** biến phân loại thiếu được gom vào nhóm `__missing__`, còn biến số thiếu được điền bằng median — một giá trị lặp lại đúng y hệt mà mô hình cây nhận ra dễ dàng. Sau tầng B.1, một mô hình nhận ra được dòng nào từng bị thiếu với AUC **0,995**. Cách ngăn rò rỉ được trình bày ở mục 4.9.

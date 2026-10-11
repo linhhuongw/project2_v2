@@ -1,10 +1,15 @@
-"""Train classic-ML models on the tier-B.1 matrices (data/processed/classic) and evaluate them.
+"""Train models on the tier-B.1 matrices and evaluate them (all on the same folds, no tuning).
 
-Models (scikit-learn defaults, no tuning; all use the same folds and B.1 matrices):
+Classic ML — data/processed/classic (one-hot + standardise), scikit-learn defaults:
   lr_default   LogisticRegression (C=1.0, L2, lbfgs); max_iter=2000 as in preprocessing_v1.md B.3
   knn_default  KNeighborsClassifier (k=5, uniform weights, Euclidean)
   rf_default   RandomForestClassifier (100 fully grown trees, sqrt features)
   nb_default   GaussianNB
+GBDT — data/processed/gbdt (integer category codes + standardise, table B.2), library defaults;
+only the seed, thread count and logging are set. Category codes are passed as numeric features.
+  xgb_default   XGBClassifier (100 trees, depth 6, learning rate 0.3, hist)
+  lgbm_default  LGBMClassifier (100 trees, 31 leaves, learning rate 0.1)
+  cat_default   CatBoostClassifier (1,000 trees, depth 6, learning rate set automatically)
 KNN is not scored on its own training set: every training point is its own nearest neighbour,
 so training AUC is meaningless, and it would cost an n_train x n_train distance computation.
 
@@ -40,7 +45,7 @@ from src.data.datasets import ROOT, SPECS
 from src.data.splits import load_meta
 from src.models.metrics import bootstrap_auc, f1_threshold, score
 
-PROCESSED = ROOT / "data" / "processed" / "classic"
+PROCESSED = ROOT / "data" / "processed"
 REPORTS = ROOT / "reports" / "models"
 SEED = 42
 
@@ -49,7 +54,14 @@ MODELS = {
     "knn_default": lambda: KNeighborsClassifier(n_jobs=-1),
     "rf_default": lambda: RandomForestClassifier(n_jobs=-1, random_state=SEED),
     "nb_default": lambda: GaussianNB(),
+    # GBDT libraries are imported only when used: LightGBM/XGBoost bundle their own OpenMP runtime,
+    # which can crash scikit-learn's multi-threaded KNN when both are loaded in one process (macOS)
+    "xgb_default": lambda: __import__("xgboost").XGBClassifier(random_state=SEED, n_jobs=-1),
+    "lgbm_default": lambda: __import__("lightgbm").LGBMClassifier(random_state=SEED, n_jobs=-1, verbose=-1),
+    "cat_default": lambda: __import__("catboost").CatBoostClassifier(random_seed=SEED, thread_count=-1, verbose=0,
+                                                                     allow_writing_files=False),
 }
+FAMILY = {"xgb_default": "gbdt", "lgbm_default": "gbdt", "cat_default": "gbdt"}  # others: classic
 SKIP_TRAIN_SCORE = {"knn_default"}
 
 
@@ -66,13 +78,13 @@ def fit(model_name, X, y):
         warnings.simplefilter("always", ConvergenceWarning)
         model.fit(X, y)
     converged = not any(issubclass(w.category, ConvergenceWarning) for w in caught)
-    n_iter = int(np.max(model.n_iter_)) if hasattr(model, "n_iter_") else None
+    n_iter = int(np.max(model.n_iter_)) if isinstance(model, LogisticRegression) else None
     return model, {"fit_seconds": round(time.perf_counter() - t0, 2), "n_iter": n_iter, "converged": converged}
 
 
 def run_dataset(name, model_name):
     meta = load_meta(name)
-    base = PROCESSED / name
+    base = PROCESSED / FAMILY.get(model_name, "classic") / name
     rows, preds, fits = [], [], {}
     thresholds = {}
     for k in range(1, meta["n_folds"] + 1):
@@ -156,7 +168,18 @@ def main(argv=None):
               + f" | converged {conv}"
               + f" | {time.perf_counter() - t0:.1f}s")
 
+    # merge with earlier results so that running a subset of datasets never drops the others
     fm = pd.DataFrame(all_rows)
+    done = set(fm.dataset)
+    if (out / "fold_metrics.csv").exists():
+        old = pd.read_csv(out / "fold_metrics.csv")
+        fm = pd.concat([old[~old.dataset.isin(done)], fm], ignore_index=True)
+    if (out / "run.json").exists():
+        old_run = json.loads((out / "run.json").read_text())
+        run["datasets"] = {**{k: v for k, v in old_run["datasets"].items() if k not in done}, **run["datasets"]}
+    order = [d for d in SPECS if d in set(fm.dataset)]
+    fm = fm.set_index("dataset").loc[order].reset_index()
+    run["datasets"] = {d: run["datasets"][d] for d in order}
     fm.to_csv(out / "fold_metrics.csv", index=False)
     summarise(fm).to_csv(out / "summary.csv", index=False)
     (out / "run.json").write_text(json.dumps(run, indent=2))

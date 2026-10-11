@@ -78,7 +78,7 @@ def process_fold(name: str, fold: int, family: str, out_dir, refit: bool = False
     else:
         parts = {"train": train, "val": val, "test": test}
 
-    pre = build_preprocessor(num_cols, cat_cols, family).fit(train[cols])   # train only
+    pre = build_preprocessor(num_cols, cat_cols, family, SPECS[name].impute).fit(train[cols])  # train only
     frames = transform_parts(pre, parts, cols)
     fit_key = "trainval" if refit else "train"
     chk = checks({"train": frames[fit_key], **{k: v for k, v in frames.items() if k != fit_key}}, len(num_cols))

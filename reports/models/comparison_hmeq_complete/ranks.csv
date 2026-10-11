@@ -1,0 +1,8 @@
+dataset,LR,KNN,RF,NB,XGB,LGBM,CatBoost
+give_me_some_credit,6.0,7.0,4.0,5.0,3.0,2.0,1.0
+taiwan_default_credit,6.0,7.0,3.0,5.0,4.0,2.0,1.0
+home_credit,3.0,6.0,5.0,7.0,4.0,2.0,1.0
+hmeq_complete,7.0,6.0,1.0,5.0,2.0,4.0,3.0
+south_german_credit,4.0,7.0,2.0,6.0,3.0,5.0,1.0
+fico_heloc,1.0,7.0,3.0,6.0,5.0,4.0,2.0
+lending_club_B,3.0,7.0,5.0,6.0,4.0,1.0,2.0

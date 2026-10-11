@@ -34,16 +34,15 @@ from sklearn.metrics import roc_auc_score  # noqa: E402
 from src.data.datasets import ROOT, SPECS  # noqa: E402
 from src.data.splits import load_fold, load_meta, load_screening  # noqa: E402
 from src.features.preprocess import build_preprocessor  # noqa: E402
-from src.models.compare_models import NAMES, RUNS  # noqa: E402
+from src.models.compare_models import CLASSIC_RUNS, COLORS, NAMES, RUNS  # noqa: E402
 from src.models.report_classic import LABELS  # noqa: E402
-from src.models.train_classic import MODELS, SKIP_TRAIN_SCORE  # noqa: E402
+from src.models.train_classic import FAMILY, MODELS, SKIP_TRAIN_SCORE  # noqa: E402
 
 OUT = ROOT / "reports" / "models" / "learning_curves"
 FRACTIONS = [0.02, 0.05, 0.1, 0.2, 0.4, 0.7, 1.0]
 MIN_ROWS = 50
 MAX_TRAIN_ALL_FOLDS = 150_000
 SEED = 42
-COLORS = {"LR": "#4C72B0", "KNN": "#DD8452", "RF": "#55A868", "NB": "#C44E52"}
 
 
 def nested_order(y: np.ndarray, seed: int) -> np.ndarray:
@@ -76,12 +75,16 @@ def curve_for(name: str, runs: list) -> list:
             sub = train.iloc[order[:n]]
             if sub["target"].nunique() < 2:
                 continue
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                pre = build_preprocessor(sc["numeric_kept"], sc["categorical_kept"], "classic").fit(sub[cols])
-                X_sub = pre.transform(sub[cols]).astype(np.float32)
-                X_val = pre.transform(val[cols]).astype(np.float32)
+            mats = {}
+            for family in {FAMILY.get(r, "classic") for r in runs}:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    pre = build_preprocessor(sc["numeric_kept"], sc["categorical_kept"], family,
+                                             SPECS[name].impute).fit(sub[cols])
+                    mats[family] = (pre.transform(sub[cols]).astype(np.float32),
+                                    pre.transform(val[cols]).astype(np.float32))
             for run in runs:
+                X_sub, X_val = mats[FAMILY.get(run, "classic")]
                 t0 = time.perf_counter()
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", ConvergenceWarning)
@@ -136,7 +139,7 @@ def tables(curves: pd.DataFrame) -> str:
         d = curves[curves.dataset == name]
         t = d.pivot_table(index="model", columns="fraction", values="val_auc", aggfunc="mean")
         n = d.groupby("fraction").n_train.mean().round().astype(int)
-        t = t.reindex([m for m in ["LR", "KNN", "RF", "NB"] if m in t.index])
+        t = t.reindex([NAMES[r] for r in RUNS if NAMES[r] in t.index])
         L += [f"**{LABELS[name]}** (số fold: {d.fold.nunique()})", "",
               "| Mô hình | " + " | ".join(f"{int(f * 100)}% (n≈{n[f]:,})".replace(",", ".") for f in t.columns) + " | Tăng từ 20% → 100% |",
               "|---|" + "---|" * (len(t.columns) + 1)]
@@ -145,18 +148,20 @@ def tables(curves: pd.DataFrame) -> str:
             L.append(f"| {m} | " + " | ".join(f"{v:.4f}" for v in r.values) + f" | {gain:+.4f} |")
         L.append("")
     L += ["## Khoảng cách AUC train − validation ở 100% dữ liệu train", "",
-          "| Bộ dữ liệu | LR | RF | NB |", "|---|---|---|---|"]
+          "| Bộ dữ liệu | " + " | ".join(m for m in dict.fromkeys(curves.model) if m != "KNN") + " |",
+          "|---|" + "---|" * (curves.model.nunique() - ("KNN" in set(curves.model)))]
     full = curves[curves.fraction == 1.0]
     for name in dict.fromkeys(curves.dataset):
         d = full[full.dataset == name].groupby("model")[["train_auc", "val_auc"]].mean()
         gap = (d.train_auc - d.val_auc)
-        L.append(f"| {LABELS[name]} | " + " | ".join(f"{gap.get(m, np.nan):+.4f}" for m in ["LR", "RF", "NB"]) + " |")
+        L.append(f"| {LABELS[name]} | " + " | ".join(f"{gap.get(m, np.nan):+.4f}" for m in dict.fromkeys(curves.model)
+                                                     if m != "KNN") + " |")
     return "\n".join(L) + "\n"
 
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--runs", nargs="+", default=RUNS, choices=RUNS)
+    p.add_argument("--runs", nargs="+", default=CLASSIC_RUNS, choices=RUNS)
     p.add_argument("names", nargs="*", help=f"datasets (default: all): {', '.join(SPECS)}")
     args = p.parse_args(argv)
     (OUT / "figures").mkdir(parents=True, exist_ok=True)
