@@ -117,20 +117,20 @@ Bốn mô hình thuộc nhóm classic ML của Baesens được huấn luyện v
 
 | Mô hình | Cấu hình mặc định | Đặc điểm |
 |---|---|---|
-| **Logistic Regression (LR)** | `C = 1,0`, phạt L2, solver `lbfgs`; `max_iter = 2000` theo khung code của đặc tả | Tuyến tính, dễ diễn giải; là chuẩn của ngành chấm điểm tín dụng |
-| **K-Nearest Neighbors (KNN)** | `k = 5`, trọng số đều, khoảng cách Euclid | Phi tham số, dựa trên khoảng cách; xác suất chỉ nhận 6 giá trị (0; 0,2; …; 1) |
-| **Random Forest (RF)** | 100 cây, cây phát triển hết độ sâu, mỗi lần tách xét √p đặc trưng | Tổ hợp cây quyết định; nắm được quan hệ phi tuyến và tương tác; không nhạy với ngoại lai |
-| **Naive Bayes (NB)** | `GaussianNB` | Giả định các đặc trưng độc lập có điều kiện và có phân phối chuẩn |
+| **Logistic Regression (LR)** (Cox, 1958) | `C = 1,0`, phạt L2, solver `lbfgs`; `max_iter = 2000` theo khung code của đặc tả | Tuyến tính, dễ diễn giải; là chuẩn của ngành chấm điểm tín dụng |
+| **K-Nearest Neighbors (KNN)** (Cover & Hart, 1967) | `k = 5`, trọng số đều, khoảng cách Euclid | Phi tham số, dựa trên khoảng cách; xác suất chỉ nhận 6 giá trị (0; 0,2; …; 1) |
+| **Random Forest (RF)** (Breiman, 2001) | 100 cây, cây phát triển hết độ sâu, mỗi lần tách xét √p đặc trưng | Tổ hợp cây quyết định; nắm được quan hệ phi tuyến và tương tác; không nhạy với ngoại lai |
+| **Naive Bayes (NB)** (Maron, 1961) | `GaussianNB` | Giả định các đặc trưng độc lập có điều kiện và có phân phối chuẩn |
 
 Với LR, mọi lần fit hội tụ sau tối đa 89 vòng (dưới giới hạn mặc định 100 của scikit-learn), nên kết quả trùng với `LogisticRegression()` mặc định hoàn toàn. KNN **không được chấm điểm trên chính tập train**, vì mỗi điểm train là láng giềng gần nhất của chính nó (AUC train vô nghĩa) và phép tính khoảng cách train × train rất tốn kém.
 
-Ba mô hình **gradient boosting (GBDT)** dùng nhánh mã số nguyên, với **tham số mặc định của từng thư viện**; chỉ đặt seed (42), số luồng CPU và tắt log:
+Ba mô hình **gradient boosting (GBDT)** — các cách cài đặt khác nhau của gradient boosting trên cây quyết định (Friedman, 2001) — dùng nhánh mã số nguyên, với **tham số mặc định của từng thư viện**; chỉ đặt seed (42), số luồng CPU và tắt log:
 
 | Mô hình | Thư viện | Cấu hình mặc định | Đặc điểm |
 |---|---|---|---|
-| **XGBoost (XGB)** | xgboost 3.3 | 100 cây, độ sâu 6, learning rate 0,3, thuật toán `hist` | Boosting theo độ sâu (level-wise), có điều chuẩn L2 |
-| **LightGBM (LGBM)** | lightgbm 4.7 | 100 cây, 31 lá, learning rate 0,1 | Boosting theo lá (leaf-wise), chia theo histogram |
-| **CatBoost** | catboost 1.2 | 1.000 cây, độ sâu 6, learning rate tự chọn theo dữ liệu | Cây đối xứng (oblivious), ordered boosting chống rò rỉ mục tiêu |
+| **XGBoost (XGB)** (Chen & Guestrin, 2016) | xgboost 3.3 | 100 cây, độ sâu 6, learning rate 0,3, thuật toán `hist` | Boosting theo độ sâu (level-wise), có điều chuẩn L2 |
+| **LightGBM (LGBM)** (Ke et al., 2017) | lightgbm 4.7 | 100 cây, 31 lá, learning rate 0,1 | Boosting theo lá (leaf-wise), chia theo histogram |
+| **CatBoost** (Prokhorenkova et al., 2018; Dorogush et al., 2018) | catboost 1.2 | 1.000 cây, độ sâu 6, learning rate tự chọn theo dữ liệu | Cây đối xứng (oblivious), ordered boosting chống rò rỉ mục tiêu |
 
 Mã số nguyên của biến phân loại được đưa vào cả ba mô hình **như biến số**, đúng theo đặc tả (bảng B.2). Cách này không tận dụng cơ chế xử lý biến phân loại riêng của CatBoost (target statistics) hay LightGBM; đây là lựa chọn để ba thư viện được so sánh trên cùng đầu vào. Không dùng dừng sớm (early stopping) vì không phải tham số mặc định.
 
