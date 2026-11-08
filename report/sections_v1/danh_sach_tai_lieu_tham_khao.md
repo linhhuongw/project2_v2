@@ -4,19 +4,27 @@ Khai báo BibTeX của các tài liệu được trích dẫn trong báo cáo, t
 
 | Trích dẫn trong bài | Khóa BibTeX |
 |---|---|
+| Baesens et al. (2003) | `baesens2003benchmarking` |
 | Baesens et al. (2026) | `baesens2026foundation` |
 | Breiman (2001) | `breiman2001random` |
+| Bücker et al. (2022) | `bucker2022transparency` |
 | Chen & Guestrin (2016) | `chen2016xgboost` |
 | Cover & Hart (1967) | `cover1967nearest` |
 | Cox (1958) | `cox1958regression` |
 | Demšar (2006) | `demsar2006statistical` |
 | Dorogush et al. (2018) | `dorogush2018catboost` |
+| Dumitrescu et al. (2022) | `dumitrescu2022machine` |
 | Friedman (2001) | `friedman2001greedy` |
 | Grömping (2019) | `gromping2019south` |
+| Gunnarsson et al. (2021) | `gunnarsson2021deep` |
+| Hand & Henley (1997) | `hand1997statistical` |
+| Hand (2006) | `hand2006classifier` |
+| Henley & Hand (1996) | `henley1996knearest` |
 | Ke et al. (2017) | `ke2017lightgbm` |
 | Lessmann et al. (2015) | `lessmann2015benchmarking` |
 | Maron (1961) | `maron1961automatic` |
 | Prokhorenkova et al. (2018) | `prokhorenkova2018catboost` |
+| Siddiqi (2017) | `siddiqi2017intelligent` |
 | Yeh & Lien (2009) | `yeh2009comparisons` |
 
 ```
@@ -152,5 +160,91 @@ Khai báo BibTeX của các tài liệu được trích dẫn trong báo cáo, t
   pages={2473--2480},
   year={2009},
   publisher={Elsevier}
+}
+
+@article{baesens2003benchmarking,
+  title={Benchmarking state-of-the-art classification algorithms for credit scoring},
+  author={Baesens, Bart and Van Gestel, Tony and Viaene, Stijn and Stepanova, Maria and Suykens, Johan and Vanthienen, Jan},
+  journal={Journal of the Operational Research Society},
+  volume={54},
+  number={6},
+  pages={627--635},
+  year={2003},
+  doi={10.1057/palgrave.jors.2601545}
+}
+
+@article{bucker2022transparency,
+  title={Transparency, auditability, and explainability of machine learning models in credit scoring},
+  author={B{\"u}cker, Michael and Szepannek, Gero and Gosiewska, Alicja and Biecek, Przemyslaw},
+  journal={Journal of the Operational Research Society},
+  volume={73},
+  number={1},
+  pages={70--90},
+  year={2022},
+  doi={10.1080/01605682.2021.1922098}
+}
+
+@article{dumitrescu2022machine,
+  title={Machine learning for credit scoring: Improving logistic regression with non-linear decision-tree effects},
+  author={Dumitrescu, Elena and Hu{\'e}, Sullivan and Hurlin, Christophe and Tokpavi, Sessi},
+  journal={European Journal of Operational Research},
+  volume={297},
+  number={3},
+  pages={1178--1192},
+  year={2022},
+  doi={10.1016/j.ejor.2021.06.053}
+}
+
+@article{gunnarsson2021deep,
+  title={Deep learning for credit scoring: Do or don't?},
+  author={Gunnarsson, Bj{\"o}rn Rafn and vanden Broucke, Seppe and Baesens, Bart and {\'O}skarsd{\'o}ttir, Mar{\'i}a and Lemahieu, Wilfried},
+  journal={European Journal of Operational Research},
+  volume={295},
+  number={1},
+  pages={292--305},
+  year={2021},
+  doi={10.1016/j.ejor.2021.03.006}
+}
+
+@article{hand2006classifier,
+  title={Classifier technology and the illusion of progress},
+  author={Hand, David J.},
+  journal={Statistical Science},
+  volume={21},
+  number={1},
+  pages={1--14},
+  year={2006},
+  doi={10.1214/088342306000000060}
+}
+
+@article{hand1997statistical,
+  title={Statistical classification methods in consumer credit scoring: a review},
+  author={Hand, David J. and Henley, William E.},
+  journal={Journal of the Royal Statistical Society: Series A (Statistics in Society)},
+  volume={160},
+  number={3},
+  pages={523--541},
+  year={1997},
+  doi={10.1111/j.1467-985X.1997.00078.x}
+}
+
+@article{henley1996knearest,
+  title={A k-nearest-neighbour classifier for assessing consumer credit risk},
+  author={Henley, William E. and Hand, David J.},
+  journal={Journal of the Royal Statistical Society: Series D (The Statistician)},
+  volume={45},
+  number={1},
+  pages={77--95},
+  year={1996},
+  doi={10.2307/2348414}
+}
+
+@book{siddiqi2017intelligent,
+  title={Intelligent Credit Scoring: Building and Implementing Better Credit Risk Scorecards},
+  author={Siddiqi, Naeem},
+  edition={2},
+  publisher={John Wiley \& Sons},
+  address={Hoboken, NJ},
+  year={2017}
 }
 ```

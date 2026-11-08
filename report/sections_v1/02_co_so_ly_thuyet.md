@@ -10,9 +10,61 @@ Bài toán có ba đặc điểm ảnh hưởng đến cách đánh giá. Thứ 
 
 ## 2.2. Các kết quả nghiên cứu tương tự
 
-<!-- TODO: tổng quan các nghiên cứu so sánh mô hình chấm điểm tín dụng, phân tích ưu nhược điểm của chúng và nêu động lực của đồ án. Cần bổ sung tài liệu tham khảo (ví dụ các benchmark so sánh nhiều mô hình trên nhiều bộ dữ liệu tín dụng); hiện thư mục references/ chỉ có các bài gốc của mô hình. -->
+Mục này trình bày ba nội dung: vì sao Logistic Regression là mô hình chuẩn của chấm điểm tín dụng và được dùng làm mốc so sánh (mục 2.2.1), các nghiên cứu so sánh mô hình đã có (mục 2.2.2), và các hạn chế của chúng dẫn tới thiết kế của đồ án (mục 2.2.3).
+
+### 2.2.1. Logistic Regression — mô hình chuẩn của chấm điểm tín dụng
+
+Chấm điểm tín dụng là một trong những ứng dụng sớm nhất của phân loại thống kê; Hand & Henley (1997) định nghĩa nó là các phương pháp thống kê chính thức để chia người xin vay thành nhóm rủi ro "tốt" và "xấu". Trong các phương pháp đó, Logistic Regression trở thành mô hình chuẩn của ngành vì bốn lý do.
+
+**Thứ nhất, mô hình diễn giải được, đáp ứng yêu cầu của cơ quan quản lý.** Quyết định cấp tín dụng ảnh hưởng trực tiếp tới người vay, nên tổ chức cho vay phải giải thích được lý do từ chối và mô hình phải được kiểm toán, kiểm định trước khi sử dụng. Mỗi hệ số của LR gắn với đúng một đặc trưng và cho biết đặc trưng đó làm tăng hay giảm log-odds vỡ nợ bao nhiêu, nên việc giải thích và kiểm tra mô hình trở nên trực tiếp. Bücker et al. (2022) chỉ ra rằng chính yêu cầu minh bạch và khả năng kiểm toán khiến các mô hình đơn giản như LR vẫn phổ biến, và năng lực dự báo của học máy hiện đại phần lớn chưa được khai thác trong thực tế. Dumitrescu et al. (2022) cũng nêu rằng LR vẫn là chuẩn của ngành chủ yếu vì các mô hình tổ hợp khó diễn giải, không tương thích với yêu cầu của cơ quan quản lý tài chính.
+
+**Thứ hai, mô hình chuyển trực tiếp thành thẻ điểm (scorecard).** Trong quy trình xây dựng thẻ điểm truyền thống, mỗi đặc trưng được chia khoảng và mã hóa bằng Weight of Evidence (WoE), sau đó LR được học trên các biến đã mã hóa; vì log-odds là tổng tuyến tính, hệ số của LR được quy đổi thành số điểm cộng cho từng khoảng của từng đặc trưng (Siddiqi, 2017). Nhân viên tín dụng và khách hàng có thể đọc điểm của từng đặc trưng mà không cần hiểu mô hình.
+
+**Thứ ba, đầu ra là xác suất được hiệu chỉnh tốt.** LR được học bằng cực đại hợp lý trên log-loss, nên xác suất dự đoán thường bám sát tần suất vỡ nợ thực tế. Tổ chức cho vay dùng trực tiếp xác suất này làm xác suất vỡ nợ (PD) để định giá khoản vay, tính tổn thất kỳ vọng và vốn dự phòng, thay vì chỉ dùng thứ hạng.
+
+**Thứ tư, hiệu năng không thua xa các mô hình phức tạp.** Baesens et al. (2003) so sánh 17 phương pháp trên 8 bộ dữ liệu tín dụng và nhận thấy, bên cạnh LS-SVM và mạng nơ-ron, các mô hình đơn giản như LR và phân tích phân biệt tuyến tính cũng cho kết quả tốt. Hand (2006) lập luận rộng hơn rằng các phương pháp đơn giản thường đạt gần bằng các phương pháp phức tạp, và phần chênh lệch có thể bị lấn át bởi những bất định ngoài khung đánh giá, như chi phí phân loại sai không đều hay phân phối dữ liệu thay đổi theo thời gian.
+
+Vì các lý do trên, một mô hình mới chỉ đáng thay thế LR khi cải thiện đủ lớn để bù cho việc mất khả năng diễn giải. Do đó, các nghiên cứu so sánh trong lĩnh vực này đều dùng LR làm mốc, và đồ án cũng dùng LR làm mô hình cơ sở (mục 4.3): câu hỏi nghiên cứu đầu tiên là các mô hình học máy có vượt LR một cách đáng kể và nhất quán hay không.
+
+### 2.2.2. Các nghiên cứu so sánh mô hình chấm điểm tín dụng
+
+<!-- DRAFT: các ý chính, cần viết thành văn và đối chiếu lại với bài gốc. -->
+
+- **Baesens et al. (2003)**: 17 phương pháp (LR, LDA, KNN, cây quyết định, mạng nơ-ron, SVM, LS-SVM, …) trên 8 bộ dữ liệu thực từ các tổ chức tài chính ở Benelux và Anh; độ đo accuracy và AUC, có kiểm định thống kê. Kết luận: LS-SVM và mạng nơ-ron tốt; LR và LDA cũng tốt, chênh lệch nhỏ.
+- **Yeh & Lien (2009)**: 6 phương pháp trên bộ Taiwan (cũng dùng trong đồ án); nhấn mạnh chất lượng xác suất vỡ nợ chứ không chỉ độ chính xác phân loại.
+- **Lessmann et al. (2015)**: cập nhật Baesens et al. (2003), 41 mô hình trên 8 bộ dữ liệu, 6 độ đo, gồm cả các phương pháp tổ hợp; có xét liệu cải thiện độ chính xác có ý nghĩa về mặt quản trị hay không. Đồng thời tổng quan các nghiên cứu trước và chỉ ra bốn hạn chế (đã nêu ở mục 1.2). <!-- TODO: đối chiếu bản đầy đủ để trích chính xác kết luận về LR và Random Forest. -->
+- **Gunnarsson et al. (2021)**: so sánh MLP và deep belief network với hai mô hình truyền thống và hai mô hình tổ hợp; XGBoost tốt nhất, mạng sâu không vượt mạng nông mà tốn tính toán hơn nhiều; dùng kiểm định Bayes bên cạnh kiểm định phi tham số.
+- **Dumitrescu et al. (2022)**: đề xuất PLTR — LR có phạt, thêm các biến nhị phân lấy từ cây quyết định nông để nắm hiệu ứng phi tuyến; trên 4 bộ dữ liệu, PLTR vượt LR có ý nghĩa và cạnh tranh với Random Forest mà vẫn diễn giải được. Cho thấy hướng cải thiện LR thay vì thay thế.
+- **Bücker et al. (2022)**: khung minh bạch, kiểm toán và giải thích cho mô hình hộp đen (công cụ giải thích mô hình), so sánh với khả năng diễn giải của scorecard.
+- **Baesens et al. (2026)**: <!-- TODO: tóm tắt thiết lập và kết luận về foundation model cho dữ liệu tín dụng dạng bảng. -->
+
+Có thể tổng hợp bằng bảng:
+
+| Nghiên cứu | Số bộ dữ liệu | Số mô hình | Độ đo | Kiểm định | XGB / LGBM / CB |
+|---|---|---|---|---|---|
+| Baesens et al. (2003) | 8 | 17 | Accuracy, AUC | Có | Không |
+| Yeh & Lien (2009) | 1 | 6 | <!-- TODO --> | <!-- TODO --> | Không |
+| Lessmann et al. (2015) | 8 | 41 | 6 độ đo | Có | Không |
+| Gunnarsson et al. (2021) | <!-- TODO --> | 6 | <!-- TODO --> | Bayes + phi tham số | XGBoost |
+| Dumitrescu et al. (2022) | 4 | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> |
+| Baesens et al. (2026) | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> |
+| **Đồ án này** | 7 | 7 | AUC, Brier, LogLoss, precision, recall, F1 | Friedman, Wilcoxon–Holm, Nemenyi, bootstrap | Cả ba |
+
+### 2.2.3. Hạn chế của các nghiên cứu và định hướng của đồ án
+
+<!-- DRAFT: các ý chính; mỗi hạn chế ứng với một lựa chọn thiết kế ở Chương 3. -->
+
+- **Ít bộ dữ liệu, nhỏ và cũ** (German, Australian) → đồ án dùng 7 bộ công khai, 1.000 đến hơn 500 nghìn khoản vay, nhiều loại sản phẩm (mục 3.2).
+- **Chỉ đo khả năng xếp hạng hoặc phân loại**, bỏ qua chất lượng xác suất, dù PD là đầu ra chính của LR trong thực tế → đồ án đo cả Brier, LogLoss và đường calibration (mục 4.1).
+- **Thiếu kiểm định phù hợp khi so sánh trên nhiều bộ dữ liệu** → kiểm định theo Demšar (2006) (mục 4.1).
+- **Phương pháp mới được tinh chỉnh kỹ hơn mô hình tham chiếu** → mọi mô hình dùng tham số mặc định, cùng quy trình chia dữ liệu và tiền xử lý (mục 3.5, 3.6).
+- **Ít chú ý tới rò rỉ dữ liệu và yếu tố thời gian** → kiểm soát rò rỉ qua giá trị thiếu ở HMEQ, chia theo thời gian ở Lending Club (mục 3.3, 3.7, 3.8).
+- **Phần lớn nghiên cứu ra đời trước LightGBM và CatBoost** → so sánh cả ba thư viện GBDT với LR trong cùng điều kiện.
+- **Lợi ích phải đủ lớn để bù cho việc mất khả năng diễn giải** (mục 2.2.1) → ngoài hạng trung bình, đồ án báo cáo mức chênh AUC so với LR trên từng bộ dữ liệu, để đánh giá khi nào LR vẫn là lựa chọn hợp lý (mục 4.7, 5.1).
 
 ## 2.3. Các mô hình phân loại classic ML
+
+Logistic Regression được chọn làm mô hình cơ sở (mục 2.2.1) nhưng có bốn hạn chế: chỉ nắm quan hệ tuyến tính trên log-odds, không tự học tương tác giữa các đặc trưng, nhạy với ngoại lai và thang đo, và dùng một hàm chung cho mọi người vay. Để đo xem các hạn chế này làm mất bao nhiêu hiệu năng, đồ án bổ sung hai mô hình bỏ giả định tuyến tính theo hai cách khác nhau. Random Forest chia không gian đặc trưng thành các vùng bằng cây quyết định, nên nắm được ngưỡng, tương tác và không nhạy với ngoại lai; nó cũng là mô hình tổ hợp cây theo bagging, làm mốc để tách lợi ích của boosting ở các mô hình gradient boosting (mục 2.4). KNN ước lượng rủi ro từ các người vay tương tự nhất mà không giả định dạng hàm, đại diện cho cách tiếp cận dựa trên khoảng cách; phương pháp này đã được áp dụng cho chấm điểm tín dụng tiêu dùng từ Henley & Hand (1996) và có mặt trong các nghiên cứu so sánh như Baesens et al. (2003). Naive Bayes được thêm làm mô hình xác suất đơn giản nhất, với giả định các đặc trưng độc lập. So sánh các mô hình này với LR cho biết dữ liệu tín dụng có cần mô hình phi tuyến hay không, và cách phi tuyến nào phù hợp.
 
 **Logistic Regression** (Cox, 1958) mô hình hóa log-odds của xác suất xấu là một hàm tuyến tính của đặc trưng: log(p / (1 − p)) = β₀ + βᵀx. Tham số được ước lượng bằng cực đại hợp lý, thường kèm phạt L2 để tránh hệ số quá lớn. Mỗi hệ số cho biết tác động của một đặc trưng lên log-odds, nên mô hình dễ diễn giải và là chuẩn của ngành chấm điểm tín dụng. Hạn chế là mô hình chỉ nắm được quan hệ tuyến tính trên thang log-odds và nhạy với ngoại lai, trừ khi đặc trưng được biến đổi trước. Hình 2.1 minh họa hàm sigmoid p = 1 / (1 + e^(−z)) ánh xạ log-odds z sang xác suất: p bằng 0,5 khi z = 0 và tiến dần về 0 hoặc 1 khi |z| tăng.
 
@@ -20,7 +72,7 @@ Bài toán có ba đặc điểm ảnh hưởng đến cách đánh giá. Thứ 
 
 *Hình 2.1. Hàm sigmoid của Logistic Regression*
 
-**K-Nearest Neighbors** (Cover & Hart, 1967) không học tham số mà ghi nhớ toàn bộ tập train. Xác suất xấu của một điểm mới là tỷ lệ điểm xấu trong k láng giềng gần nhất theo một khoảng cách, thường là khoảng cách Euclid trên đặc trưng đã chuẩn hóa. Mô hình linh hoạt nhưng chậm khi dự đoán, vì phải tính khoảng cách tới mọi điểm train, và kém đi khi số chiều lớn, vì khi đó khoảng cách giữa các điểm trở nên gần như nhau.
+**K-Nearest Neighbors** (Cover & Hart, 1967) không học tham số mà ghi nhớ toàn bộ tập train. Xác suất xấu của một điểm mới là tỷ lệ điểm xấu trong k láng giềng gần nhất theo một khoảng cách, thường là khoảng cách Euclid trên đặc trưng đã chuẩn hóa. Mô hình linh hoạt nhưng chậm khi dự đoán, vì phải tính khoảng cách tới mọi điểm train, và kém đi khi số chiều lớn, vì khi đó khoảng cách giữa các điểm trở nên gần như nhau. Henley & Hand (1996) áp dụng KNN cho bài toán chấm điểm tín dụng tiêu dùng và so sánh với hồi quy tuyến tính, Logistic Regression và cây quyết định.
 
 **Naive Bayes** (Maron, 1961) áp dụng định lý Bayes, P(y | x) ∝ P(y) · ∏ⱼ P(xⱼ | y), với giả định các đặc trưng độc lập có điều kiện khi biết nhãn. Biến thể Gaussian giả định thêm mỗi đặc trưng có phân phối chuẩn trong từng lớp. Mô hình huấn luyện rất nhanh và cần ít dữ liệu, nhưng khi các đặc trưng tương quan mạnh, bằng chứng từ chúng bị đếm lặp và xác suất dự đoán dồn về gần 0 hoặc 1.
 
