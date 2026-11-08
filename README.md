@@ -16,7 +16,7 @@ Credit default prediction, version 2. Raw data copied from `project2_v1/data/raw
 | `scripts/` | CLI entry points |
 | `models/` | Saved model artifacts |
 | `reports/` | Generated results (JSON/MD, `figures/`, `tables/`) |
-| `report/` | Hand-written final report (`report.md` + `sections/`) |
+| `report/` | Hand-written final report: chapters in `sections_v1/`, figures in `hinh_ve/`, template in `template.md` |
 
 ## Reproduce
 

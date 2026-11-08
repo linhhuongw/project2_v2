@@ -1,0 +1,79 @@
+{
+  "collapse-filter": true,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "path:obsidian/00_MOC",
+      "color": {
+        "a": 1,
+        "rgb": 15026253
+      }
+    },
+    {
+      "query": "path:obsidian/10_Papers",
+      "color": {
+        "a": 1,
+        "rgb": 9326278
+      }
+    },
+    {
+      "query": "path:obsidian/L0_Foundations",
+      "color": {
+        "a": 1,
+        "rgb": 37119
+      }
+    },
+    {
+      "query": "path:obsidian/L1_ML_Concepts",
+      "color": {
+        "a": 1,
+        "rgb": 3187820
+      }
+    },
+    {
+      "query": "path:obsidian/L2_Model_Families",
+      "color": {
+        "a": 1,
+        "rgb": 16098851
+      }
+    },
+    {
+      "query": "path:obsidian/L3_Algorithms",
+      "color": {
+        "a": 1,
+        "rgb": 14041247
+      }
+    },
+    {
+      "query": "path:obsidian/L4_Implementation",
+      "color": {
+        "a": 1,
+        "rgb": 7231183
+      }
+    },
+    {
+      "query": "path:sources",
+      "color": {
+        "a": 1,
+        "rgb": 9276813
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.518713248970312,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 0.9273190715177964,
+  "close": true
+}
