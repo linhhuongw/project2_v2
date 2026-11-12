@@ -17,6 +17,9 @@ aliases:
 # Bayes error (Sai số Bayes)
 
 **Định nghĩa:** Sai số nhỏ nhất mà bất kỳ bộ phân loại nào có thể đạt được khi biết phân phối thật; đạt được bằng cách chọn lớp có xác suất hậu nghiệm lớn nhất.
+**Bayes error** = trung bình sai số này trên mọi x, có trọng số là P(x):
+
+$$\text{Bayes error} = \sum_x P(x)\,\big(1 - \max_y P(y \mid x)\big)$$
 
 **Suy ra từ:** [[Bayes theorem]]
 

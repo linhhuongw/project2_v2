@@ -53,44 +53,44 @@ flowchart LR
 
 ## 2. Kiến thức dùng chung giữa các mô hình
 
-| Khái niệm                         | Tầng | Logistic Regression | Naive Bayes | KNN | Random Forest | XGBoost | LightGBM | CatBoost | Số mô hình |
-| --------------------------------- | ---- | ------------------- | ----------- | --- | ------------- | ------- | -------- | -------- | ---------- |
-| [[Feature]]                       | `L1` | ✓                   | ✓           | ✓   | ✓             | ✓       | ✓        | ✓        | 7          |
-| [[Supervised learning]]           | `L1` | ✓                   | ✓           | ✓   | ✓             | ✓       | ✓        | ✓        | 7          |
-| [[Conditional probability]]       | `L0` |                     | ✓           | ✓   | ✓             | ✓       | ✓        |          | 5          |
-| [[Generalization]]                | `L1` | ✓                   |             |     | ✓             | ✓       | ✓        | ✓        | 5          |
-| [[Overfitting]]                   | `L1` | ✓                   |             |     | ✓             | ✓       | ✓        | ✓        | 5          |
-| [[Bernoulli distribution]]        | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Gradient descent]]              | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Likelihood]]                    | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Logistic function]]             | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Logit]]                         | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Newton method]]                 | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Odds]]                          | `L0` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Log-loss]]                      | `L1` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Loss function]]                 | `L1` | ✓                   |             |     |               | ✓       | ✓        | ✓        | 4          |
-| [[Decision tree]]                 | `L2` |                     |             |     | ✓             | ✓       | ✓        | ✓        | 4          |
-| [[Tree ensembles]]                | `L2` |                     |             |     | ✓             | ✓       | ✓        | ✓        | 4          |
-| [[Information gain]]              | `L0` |                     |             |     | ✓             | ✓       | ✓        |          | 3          |
-| [[Prior probability]]             | `L0` |                     | ✓           | ✓   |               |         |          | ✓        | 3          |
-| [[Regularization]]                | `L0` | ✓                   |             |     |               | ✓       | ✓        |          | 3          |
-| [[Shannon entropy]]               | `L0` |                     |             |     | ✓             | ✓       | ✓        |          | 3          |
-| [[Boosting]]                      | `L2` |                     |             |     |               | ✓       | ✓        | ✓        | 3          |
-| [[Split criterion]]               | `L2` |                     |             |     | ✓             | ✓       | ✓        |          | 3          |
-| [[Tree growth strategy]]          | `L2` |                     |             |     |               | ✓       | ✓        | ✓        | 3          |
-| [[Gradient Boosting]]             | `L3` |                     |             |     |               | ✓       | ✓        | ✓        | 3          |
-| [[Pseudo-residual]]               | `L3` |                     |             |     |               | ✓       | ✓        | ✓        | 3          |
-| [[Shrinkage]]                     | `L3` |                     |             |     |               | ✓       | ✓        | ✓        | 3          |
-| [[Bayes theorem]]                 | `L0` |                     | ✓           | ✓   |               |         |          |          | 2          |
-| [[Posterior probability]]         | `L0` |                     | ✓           | ✓   |               |         |          |          | 2          |
-| [[Sampling]]                      | `L0` |                     |             |     | ✓             |         | ✓        |          | 2          |
-| [[Categorical encoding]]          | `L1` |                     |             |     |               |         | ✓        | ✓        | 2          |
-| [[Feature scaling]]               | `L1` | ✓                   |             | ✓   |               |         |          |          | 2          |
-| [[Log-loss gradient and Hessian]] | `L1` |                     |             |     |               | ✓       | ✓        |          | 2          |
-| [[Histogram-based split]]         | `L3` |                     |             |     |               | ✓       | ✓        |          | 2          |
-| [[Random feature subspace]]       | `L3` |                     |             |     | ✓             | ✓       |          |          | 2          |
-| [[Regularized objective]]         | `L3` |                     |             |     |               | ✓       | ✓        |          | 2          |
-| [[Split gain]]                    | `L3` |                     |             |     |               | ✓       | ✓        |          | 2          |
+| Khái niệm | Tầng | Logistic Regression | Naive Bayes | KNN | Random Forest | XGBoost | LightGBM | CatBoost | Số mô hình |
+|---|---|---|---|---|---|---|---|---|---|
+| [[Feature]] | `L1` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 7 |
+| [[Supervised learning]] | `L1` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 7 |
+| [[Conditional probability]] | `L0` |  | ✓ | ✓ | ✓ | ✓ | ✓ |  | 5 |
+| [[Generalization]] | `L1` | ✓ |  |  | ✓ | ✓ | ✓ | ✓ | 5 |
+| [[Overfitting]] | `L1` | ✓ |  |  | ✓ | ✓ | ✓ | ✓ | 5 |
+| [[Bernoulli distribution]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Gradient descent]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Likelihood]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Logistic function]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Logit]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Newton method]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Odds]] | `L0` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Log-loss]] | `L1` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Loss function]] | `L1` | ✓ |  |  |  | ✓ | ✓ | ✓ | 4 |
+| [[Decision tree]] | `L2` |  |  |  | ✓ | ✓ | ✓ | ✓ | 4 |
+| [[Tree ensembles]] | `L2` |  |  |  | ✓ | ✓ | ✓ | ✓ | 4 |
+| [[Information gain]] | `L0` |  |  |  | ✓ | ✓ | ✓ |  | 3 |
+| [[Prior probability]] | `L0` |  | ✓ | ✓ |  |  |  | ✓ | 3 |
+| [[Regularization]] | `L0` | ✓ |  |  |  | ✓ | ✓ |  | 3 |
+| [[Shannon entropy]] | `L0` |  |  |  | ✓ | ✓ | ✓ |  | 3 |
+| [[Boosting]] | `L2` |  |  |  |  | ✓ | ✓ | ✓ | 3 |
+| [[Split criterion]] | `L2` |  |  |  | ✓ | ✓ | ✓ |  | 3 |
+| [[Tree growth strategy]] | `L2` |  |  |  |  | ✓ | ✓ | ✓ | 3 |
+| [[Gradient Boosting]] | `L3` |  |  |  |  | ✓ | ✓ | ✓ | 3 |
+| [[Pseudo-residual]] | `L3` |  |  |  |  | ✓ | ✓ | ✓ | 3 |
+| [[Shrinkage]] | `L3` |  |  |  |  | ✓ | ✓ | ✓ | 3 |
+| [[Bayes theorem]] | `L0` |  | ✓ | ✓ |  |  |  |  | 2 |
+| [[Posterior probability]] | `L0` |  | ✓ | ✓ |  |  |  |  | 2 |
+| [[Sampling]] | `L0` |  |  |  | ✓ |  | ✓ |  | 2 |
+| [[Categorical encoding]] | `L1` |  |  |  |  |  | ✓ | ✓ | 2 |
+| [[Feature scaling]] | `L1` | ✓ |  | ✓ |  |  |  |  | 2 |
+| [[Log-loss gradient and Hessian]] | `L1` |  |  |  |  | ✓ | ✓ |  | 2 |
+| [[Histogram-based split]] | `L3` |  |  |  |  | ✓ | ✓ |  | 2 |
+| [[Random feature subspace]] | `L3` |  |  |  | ✓ | ✓ |  |  | 2 |
+| [[Regularized objective]] | `L3` |  |  |  |  | ✓ | ✓ |  | 2 |
+| [[Split gain]] | `L3` |  |  |  |  | ✓ | ✓ |  | 2 |
 
 ## 3. Lộ trình ngược của từng mô hình
 
@@ -148,11 +148,11 @@ flowchart TD
     n15 --> n16
     n3 --> n17
     n17 --> n18
-    class n16,n10 new
-    class n12,n18,n19,n15,n0,n17,n2,n6,n14,n3,n1,n4,n11 prereq
-    class n8,n13 inherited
-    class n9 model
+    class n19,n17,n14,n12,n0,n1,n4,n3,n2,n11,n18,n15,n6 prereq
+    class n13,n8 inherited
     class n5 config
+    class n9 model
+    class n16,n10 new
     class n7 base
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19 internal-link
     classDef prereq fill:#f1f1f1,stroke:#9a9a9a
@@ -205,12 +205,12 @@ flowchart TD
     n7 --> n10
     n0 --> n11
     n3 --> n13
-    class n4,n2,n14,n5,n3,n1,n12 prereq
-    class n9 model
-    class n11,n7,n0 inherited
-    class n8 config
-    class n6 base
+    class n1,n2,n14,n12,n3,n4,n5 prereq
+    class n0,n11,n7 inherited
     class n10,n13 new
+    class n6 base
+    class n8 config
+    class n9 model
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14 internal-link
     classDef prereq fill:#f1f1f1,stroke:#9a9a9a
     classDef base fill:#cfe8ff,stroke:#0090ff
@@ -256,12 +256,12 @@ flowchart TD
     n0 --> n9
     n3 --> n9
     n1 --> n10
-    class n4,n0,n5,n6,n12,n2,n11,n1 prereq
-    class n8 config
     class n9 new
-    class n7 model
+    class n2,n12,n1,n11,n5,n4,n0,n6 prereq
     class n3 base
     class n10 inherited
+    class n7 model
+    class n8 config
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12 internal-link
     classDef prereq fill:#f1f1f1,stroke:#9a9a9a
     classDef base fill:#cfe8ff,stroke:#0090ff
@@ -326,12 +326,12 @@ flowchart TD
     n0 --> n17
     n6 --> n17
     n4 --> n19
-    class n4,n18,n3,n2,n14,n10,n19,n6,n5,n8,n7,n15 prereq
+    class n17,n9,n13 new
+    class n18,n10,n19,n5,n15,n8,n6,n3,n2,n14,n7,n4 prereq
     class n1,n16 inherited
-    class n12 model
-    class n17,n13,n9 new
     class n11 config
     class n0 base
+    class n12 model
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19 internal-link
     classDef prereq fill:#f1f1f1,stroke:#9a9a9a
     classDef base fill:#cfe8ff,stroke:#0090ff
@@ -436,12 +436,12 @@ flowchart TD
     n8 --> n34
     n10 --> n34
     n33 --> n34
-    class n8,n25,n13,n29,n11,n30,n20,n14,n16,n3,n12,n18,n2,n0,n31,n17,n19,n5,n1,n4,n9,n7,n15,n27,n24,n10 prereq
-    class n34 config
-    class n22,n21 inherited
-    class n33 model
+    class n29,n19,n0,n8,n30,n20,n10,n5,n2,n3,n15,n12,n13,n18,n17,n16,n24,n27,n4,n7,n9,n14,n25,n1,n31,n11 prereq
     class n6 base
-    class n28,n32,n23,n26 new
+    class n23,n28,n26,n32 new
+    class n21,n22 inherited
+    class n34 config
+    class n33 model
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34 internal-link
     classDef prereq fill:#f1f1f1,stroke:#9a9a9a
     classDef base fill:#cfe8ff,stroke:#0090ff
@@ -547,10 +547,10 @@ flowchart TD
     n31 --> n32
     n4 --> n34
     n4 --> n35
-    class n11,n32,n13 inherited
-    class n30,n18,n26,n33,n16,n34,n25,n2,n19,n21,n4,n17,n23,n3,n0,n35,n28,n22,n24,n8,n1,n6,n12,n27,n10,n20,n31,n29 prereq
-    class n5,n7 new
+    class n33,n24,n0,n34,n25,n8,n27,n3,n4,n20,n17,n18,n23,n22,n21,n29,n31,n6,n10,n12,n19,n2,n30,n35,n1,n28,n26,n16 prereq
     class n9 base
+    class n11,n13,n32 inherited
+    class n5,n7 new
     class n14 model
     class n15 config
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35 internal-link
@@ -643,11 +643,11 @@ flowchart TD
     n8 --> n27
     n6 --> n28
     n6 --> n29
-    class n15,n25,n6,n12,n26,n18,n29,n0,n27,n21,n16,n11,n28,n24,n8,n1,n7,n23,n10,n14,n13 prereq
-    class n2 model
-    class n5,n4 inherited
-    class n20,n22,n19,n17 new
+    class n26,n21,n23,n16,n27,n0,n15,n28,n24,n7,n10,n13,n8,n25,n29,n1,n6,n14,n12,n18,n11 prereq
     class n9 base
+    class n17,n19,n20,n22 new
+    class n2 model
+    class n4,n5 inherited
     class n3 config
     class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29 internal-link
     classDef prereq fill:#f1f1f1,stroke:#9a9a9a

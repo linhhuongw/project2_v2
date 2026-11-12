@@ -19,7 +19,7 @@ tags:
 
 # Posterior probability (Xác suất hậu nghiệm)
 
-$P(C_j\mid W_k\cdots W_r)$, Maron gọi là *attribute number*.
+$P(C_j\mid W_k\cdots W_r)$, Maron gọi là *attribute number*. - kết quả của Bayes Theorem
 
 Nguồn: [[Maron 1961]]
 
