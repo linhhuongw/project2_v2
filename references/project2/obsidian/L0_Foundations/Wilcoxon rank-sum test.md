@@ -22,7 +22,7 @@ Nguồn: [[Cox 1958]]
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** —
-**➡ Mở ra:** —
+**➡ Mở ra:** [[AUC]]
 **🎯 Dùng trong mô hình:** —
 **↳ Nhánh con (cây phân loại):** —
 <!-- tree:auto end -->

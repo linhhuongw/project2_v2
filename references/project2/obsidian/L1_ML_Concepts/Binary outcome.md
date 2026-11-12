@@ -36,7 +36,7 @@ Nhãn vỡ nợ (bad = 1) / không vỡ nợ (good = 0).
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** [[Bernoulli distribution]]
-**➡ Mở ra:** [[Predicted probability]]
+**➡ Mở ra:** [[Confusion matrix]] · [[Predicted probability]]
 **🎯 Dùng trong mô hình:** —
 **↳ Nhánh con (cây phân loại):** [[Predicted probability]]
 <!-- tree:auto end -->

@@ -15,7 +15,7 @@ aliases:
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** —
-**➡ Mở ra:** —
+**➡ Mở ra:** [[Calibration curve]]
 **🎯 Dùng trong mô hình:** —
-**↳ Nhánh con (cây phân loại):** —
+**↳ Nhánh con (cây phân loại):** [[Calibration curve]]
 <!-- tree:auto end -->

@@ -16,5 +16,5 @@ aliases:
 **⬅ Cần biết trước:** —
 **➡ Mở ra:** [[Project metrics]]
 **🎯 Dùng trong mô hình:** —
-**↳ Nhánh con (cây phân loại):** [[AUC]] · [[Brier score]] · [[Project metrics]]
+**↳ Nhánh con (cây phân loại):** [[Brier score]] · [[Confusion matrix]] · [[PR curve]] · [[ROC curve]] · [[Project metrics]]
 <!-- tree:auto end -->

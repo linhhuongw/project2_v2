@@ -25,5 +25,5 @@ aliases:
 **⬅ Cần biết trước:** [[Supervised learning]]
 **➡ Mở ra:** [[Overfitting]] · [[Train-test split]] · [[Out-of-bag error]] · [[Strength and correlation]]
 **🎯 Dùng trong mô hình:** [[Logistic Regression]] · [[Random Forest]] · [[XGBoost]] · [[LightGBM]] · [[CatBoost]]
-**↳ Nhánh con (cây phân loại):** [[Bias-variance tradeoff]] · [[Overfitting]] · [[Train-test split]]
+**↳ Nhánh con (cây phân loại):** [[Bias-variance tradeoff]] · [[Learning curve]] · [[Overfitting]] · [[Train-test split]]
 <!-- tree:auto end -->

@@ -8,7 +8,7 @@ aliases:
 
 # Project metrics (Thước đo trong đồ án)
 
-**Định nghĩa:** AUC, Brier, precision/recall/F1 theo ngưỡng; khoảng tin cậy bootstrap của AUC cho Lending Club.
+**Định nghĩa:** Không phụ thuộc ngưỡng: [[AUC]], [[Gini coefficient]], [[KS statistic]], [[Brier score]], [[Log-loss]], [[Average Precision]]. Theo ngưỡng (tối đa F1 trên validation): [[Precision]], [[Recall]], [[F1 score]], [[Accuracy]]. Hình: [[ROC curve]], [[PR curve]], [[Calibration curve]]. Khoảng tin cậy bootstrap của AUC cho Lending Club.
 
 **Suy ra từ:** [[Model evaluation]]
 

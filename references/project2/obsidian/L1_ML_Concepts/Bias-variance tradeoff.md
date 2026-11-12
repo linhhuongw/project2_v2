@@ -24,7 +24,7 @@ aliases:
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** [[Overfitting]]
-**➡ Mở ra:** [[Random Forest]]
+**➡ Mở ra:** [[Learning curve]] · [[Random Forest]]
 **🎯 Dùng trong mô hình:** [[Random Forest]]
 **↳ Nhánh con (cây phân loại):** —
 <!-- tree:auto end -->

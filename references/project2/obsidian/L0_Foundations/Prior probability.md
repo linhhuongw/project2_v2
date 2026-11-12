@@ -30,7 +30,7 @@ Nguồn: [[Maron 1961]]
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** —
-**➡ Mở ra:** [[Bayes theorem]] · [[Ordered target statistics]]
+**➡ Mở ra:** [[Bayes theorem]] · [[Accuracy]] · [[Average Precision]] · [[Ordered target statistics]]
 **🎯 Dùng trong mô hình:** [[Naive Bayes]] · [[KNN]] · [[CatBoost]]
 **↳ Nhánh con (cây phân loại):** —
 <!-- tree:auto end -->

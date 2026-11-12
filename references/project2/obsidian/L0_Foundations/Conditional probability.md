@@ -31,7 +31,7 @@ Toàn bộ phương pháp dựa trên $P(C_j\mid W)$ và $P(W\mid C_j)$ (§6).
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** —
-**➡ Mở ra:** [[Bayes theorem]] · [[Independence assumption]] · [[Information gain]]
+**➡ Mở ra:** [[Bayes theorem]] · [[Independence assumption]] · [[Information gain]] · [[Precision]] · [[Recall]] · [[Specificity]]
 **🎯 Dùng trong mô hình:** [[Naive Bayes]] · [[KNN]] · [[Random Forest]] · [[XGBoost]] · [[LightGBM]]
 **↳ Nhánh con (cây phân loại):** [[Bayes theorem]] · [[Independence assumption]]
 <!-- tree:auto end -->

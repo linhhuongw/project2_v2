@@ -32,7 +32,7 @@ Ma trận từ gợi ý × danh mục: ô (i, j) là số lần từ *i* xuất 
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** —
-**➡ Mở ra:** [[Empty cells and small counts]]
+**➡ Mở ra:** [[Empty cells and small counts]] · [[Confusion matrix]]
 **🎯 Dùng trong mô hình:** [[Naive Bayes]]
 **↳ Nhánh con (cây phân loại):** [[Empty cells and small counts]]
 <!-- tree:auto end -->

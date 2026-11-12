@@ -38,7 +38,7 @@ Dùng cho AUC (thứ hạng) và Brier score / hiệu chỉnh xác suất (độ
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** [[Binary outcome]]
-**➡ Mở ra:** [[Threshold selection]]
+**➡ Mở ra:** [[PR curve]] · [[ROC curve]] · [[Threshold selection]]
 **🎯 Dùng trong mô hình:** —
 **↳ Nhánh con (cây phân loại):** [[Probability calibration]] · [[Threshold selection]]
 <!-- tree:auto end -->

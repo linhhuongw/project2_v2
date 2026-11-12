@@ -28,7 +28,7 @@ Nguồn: [[Maron 1961]]
 
 <!-- tree:auto start -->
 **⬅ Cần biết trước:** [[Generalization]]
-**➡ Mở ra:** [[Data leakage]]
+**➡ Mở ra:** [[Data leakage]] · [[Learning curve]]
 **🎯 Dùng trong mô hình:** [[CatBoost]]
 **↳ Nhánh con (cây phân loại):** [[Cross-validation]] · [[Data leakage]]
 <!-- tree:auto end -->

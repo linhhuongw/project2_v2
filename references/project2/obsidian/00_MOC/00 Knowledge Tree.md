@@ -2,9 +2,10 @@
 type: moc
 ---
 
+
 # Cây kiến thức — từ nền tảng đến triển khai
 
-*Sinh tự động bởi `scripts/build_knowledge_tree.py` — đừng sửa tay. 114 khái niệm.*
+*Sinh tự động bởi `scripts/build_knowledge_tree.py` — đừng sửa tay. 127 khái niệm.*
 
 Tầng: `L0` Nền tảng → `L1` Khái niệm ML → `L2` Họ mô hình → `L3` Thuật toán → `L4` Triển khai. Đây là cây **phân loại** (`up:`). Lộ trình học theo mô hình (`requires:`) nằm ở [[03 Model Paths]].
 
@@ -60,6 +61,7 @@ Tầng: `L0` Nền tảng → `L1` Khái niệm ML → `L2` Họ mô hình → `
             - [[Binary outcome]] `L1` — Kết quả nhị phân <small>(Cox 1958, Maron 1961)</small>
                 - [[Predicted probability]] `L1` — Xác suất dự đoán <small>(Cox 1958, Maron 1961)</small>
                     - [[Probability calibration]] `L1` — Hiệu chỉnh xác suất
+                        - [[Calibration curve]] `L1` — Đường calibration
                     - [[Threshold selection]] `L4` — Chọn ngưỡng
             - [[Feature]] `L1` — Đặc trưng <small>(Cox 1958, Maron 1961, Breiman 2001)</small>
                 - [[Categorical encoding]] `L1` — Mã hóa biến phân loại <small>(Prokhorenkova 2018, Dorogush 2018)</small>
@@ -68,6 +70,7 @@ Tầng: `L0` Nền tảng → `L1` Khái niệm ML → `L2` Họ mô hình → `
                 - [[Preprocessing B0-B1]] `L4` — Tiền xử lý
             - [[Generalization]] `L1` — Tổng quát hóa <small>(Breiman 2001)</small>
                 - [[Bias-variance tradeoff]] `L1` — Đánh đổi bias – variance <small>(Breiman 2001, Friedman 2001)</small>
+                - [[Learning curve]] `L1` — Đường học
                 - [[Overfitting]] `L1` — Quá khớp <small>(Maron 1961, Breiman 2001, Ke 2017, Prokhorenkova 2018)</small>
                 - [[Train-test split]] `L1` — Chia tập huấn luyện – kiểm tra <small>(Maron 1961)</small>
                     - [[Cross-validation]] `L1` — Kiểm định chéo
@@ -75,8 +78,19 @@ Tầng: `L0` Nền tảng → `L1` Khái niệm ML → `L2` Họ mô hình → `
                     - [[Data leakage]] `L1` — Rò rỉ dữ liệu <small>(Prokhorenkova 2018)</small>
             - [[Loss function]] `L1` — Hàm mất mát <small>(Friedman 2001)</small>
             - [[Model evaluation]] `L1` — Đánh giá mô hình
-                - [[AUC]] `L1` — Diện tích dưới đường ROC
                 - [[Brier score]] `L1` — Điểm Brier
+                - [[Confusion matrix]] `L1` — Ma trận nhầm lẫn
+                    - [[Accuracy]] `L1` — Độ chính xác tổng thể
+                    - [[F1 score]] `L1` — Điểm F1
+                    - [[Precision]] `L1` — Độ chính xác dương
+                    - [[Recall]] `L1` — Độ nhạy
+                    - [[Specificity]] `L1` — Độ đặc hiệu
+                - [[PR curve]] `L1` — Đường precision–recall
+                    - [[Average Precision]] `L1` — Độ chính xác trung bình
+                - [[ROC curve]] `L1` — Đường ROC
+                    - [[AUC]] `L1` — Diện tích dưới đường ROC
+                        - [[Gini coefficient]] `L1` — Hệ số Gini
+                    - [[KS statistic]] `L1` — Thống kê KS
                 - [[Project metrics]] `L4` — Thước đo trong đồ án
             - [[Simplifying assumption]] `L1` — Giả định đơn giản hóa <small>(Cox 1958, Maron 1961)</small>
             - [[Decision tree]] `L2` — Cây quyết định <small>(Breiman 2001, Friedman 2001)</small>
@@ -323,77 +337,103 @@ flowchart TD
     n1["Binary outcome"]
     n2["Predicted probability"]
     n3["Probability calibration"]
-    n4["Threshold selection"]
-    n5["Feature"]
-    n6["Categorical encoding"]
-    n7["Feature scaling"]
-    n8["Feature selection"]
-    n9["Preprocessing B0-B1"]
-    n10["Generalization"]
-    n11["Bias-variance tradeoff"]
-    n12["Overfitting"]
-    n13["Train-test split"]
-    n14["Cross-validation"]
-    n15["CV scheme"]
-    n16["Data leakage"]
-    n17["Loss function"]
-    n18["Model evaluation"]
-    n19["AUC"]
-    n20["Brier score"]
-    n21["Project metrics"]
-    n22["Simplifying assumption"]
-    n23["Decision tree"]
-    n24["Distance-based models"]
-    n25["KNN"]
-    n26["Nearest neighbor error bound"]
-    n27["KNN config"]
-    n28["Generative models"]
-    n29["Naive Bayes"]
-    n30["Naive Bayes formula"]
-    n31["NB config"]
-    n32["Linear probabilistic models"]
-    n33["Logistic Regression"]
-    n34["LR config"]
+    n4["Calibration curve"]
+    n5["Threshold selection"]
+    n6["Feature"]
+    n7["Categorical encoding"]
+    n8["Feature scaling"]
+    n9["Feature selection"]
+    n10["Preprocessing B0-B1"]
+    n11["Generalization"]
+    n12["Bias-variance tradeoff"]
+    n13["Learning curve"]
+    n14["Overfitting"]
+    n15["Train-test split"]
+    n16["Cross-validation"]
+    n17["CV scheme"]
+    n18["Data leakage"]
+    n19["Loss function"]
+    n20["Model evaluation"]
+    n21["Brier score"]
+    n22["Confusion matrix"]
+    n23["Accuracy"]
+    n24["F1 score"]
+    n25["Precision"]
+    n26["Recall"]
+    n27["Specificity"]
+    n28["PR curve"]
+    n29["Average Precision"]
+    n30["ROC curve"]
+    n31["AUC"]
+    n32["Gini coefficient"]
+    n33["KS statistic"]
+    n34["Project metrics"]
+    n35["Simplifying assumption"]
+    n36["Decision tree"]
+    n37["Distance-based models"]
+    n38["KNN"]
+    n39["Nearest neighbor error bound"]
+    n40["KNN config"]
+    n41["Generative models"]
+    n42["Naive Bayes"]
+    n43["Naive Bayes formula"]
+    n44["NB config"]
+    n45["Linear probabilistic models"]
+    n46["Logistic Regression"]
+    n47["LR config"]
     n0 --> n1
     n1 --> n2
     n2 --> n3
-    n2 --> n4
-    n0 --> n5
-    n5 --> n6
-    n5 --> n7
-    n5 --> n8
-    n5 --> n9
-    n0 --> n10
-    n10 --> n11
-    n10 --> n12
-    n10 --> n13
-    n13 --> n14
-    n14 --> n15
-    n13 --> n16
-    n0 --> n17
-    n0 --> n18
-    n18 --> n19
-    n18 --> n20
-    n18 --> n21
-    n0 --> n22
-    n0 --> n23
-    n0 --> n24
-    n24 --> n25
-    n25 --> n26
-    n25 --> n27
-    n0 --> n28
+    n3 --> n4
+    n2 --> n5
+    n0 --> n6
+    n6 --> n7
+    n6 --> n8
+    n6 --> n9
+    n6 --> n10
+    n0 --> n11
+    n11 --> n12
+    n11 --> n13
+    n11 --> n14
+    n11 --> n15
+    n15 --> n16
+    n16 --> n17
+    n15 --> n18
+    n0 --> n19
+    n0 --> n20
+    n20 --> n21
+    n20 --> n22
+    n22 --> n23
+    n22 --> n24
+    n22 --> n25
+    n22 --> n26
+    n22 --> n27
+    n20 --> n28
     n28 --> n29
-    n29 --> n30
-    n29 --> n31
-    n0 --> n32
-    n32 --> n33
-    n33 --> n34
-    class n0,n1,n2,n3,n5,n6,n7,n8,n10,n11,n12,n13,n14,n16,n17,n18,n19,n20,n22 L1
-    class n23,n24,n28,n32 L2
-    class n25,n26,n29,n30,n33 L3
-    class n4,n9,n15,n21,n27,n31,n34 L4
-    class n23 branch
-    class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34 internal-link
+    n20 --> n30
+    n30 --> n31
+    n31 --> n32
+    n30 --> n33
+    n20 --> n34
+    n0 --> n35
+    n0 --> n36
+    n0 --> n37
+    n37 --> n38
+    n38 --> n39
+    n38 --> n40
+    n0 --> n41
+    n41 --> n42
+    n42 --> n43
+    n42 --> n44
+    n0 --> n45
+    n45 --> n46
+    n46 --> n47
+    class n0,n1,n2,n3,n4,n6,n7,n8,n9,n11,n12,n13,n14,n15,n16,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n35 L1
+    class n36,n37,n41,n45 L2
+    class n38,n39,n42,n43,n46 L3
+    class n5,n10,n17,n34,n40,n44,n47 L4
+    class n36 branch
+    class n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36,n37,n38,n39,n40,n41,n42,n43,n44,n45,n46,n47 internal-link
     classDef L0 fill:#cfe8ff,stroke:#0090ff
     classDef L1 fill:#d3f4e0,stroke:#30a46c
     classDef L2 fill:#ffe7c2,stroke:#f5a623
